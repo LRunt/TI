@@ -33,6 +33,10 @@ public class DrawingPanel extends Component {
 	private final Color VODA = Color.BLUE;
 	/** Barva car - cerna */
 	private final Color CARA = Color.BLACK;
+	/** Barva zhasle zarovky */
+	private final Color ZAROVKA_ZHASLA = Color.GRAY;
+	/** Barva rozsvicene zarovky */
+	private final Color ZAROVKA_SVITI = Color.YELLOW;
 	/** Jak se rychle budou napustet a vypoustet tanky */
 	private final int RYCHLOST_PRUTOKU = 2;
 	/** Pri kolika procentech naplneni bude mit horni cidlo tanku logickou jednicku*/
@@ -41,7 +45,7 @@ public class DrawingPanel extends Component {
 	private final int DOLNI_CIDLO = 1; 
 	private FontMetrics font;
 	/** zda jsou filtrovany tanky */
-	private boolean beziAkce;
+	private boolean beziAkce = false;
 	
 	private Color tlacitkoA;
 	private Color tlacitkoB;
@@ -78,7 +82,7 @@ public class DrawingPanel extends Component {
 		this.setPreferredSize(new Dimension(600, 500));
 		tlacitkoA = LOG_NULA;
 		tlacitkoB = LOG_NULA;
-		zarovka = Color.GRAY;
+		zarovka = ZAROVKA_ZHASLA;
 		V1 = LOG_NULA;
 		V2 = LOG_NULA;
 		V3 = LOG_NULA;
@@ -89,7 +93,6 @@ public class DrawingPanel extends Component {
 		cerpadlo = LOG_NULA;
 		ph = LOG_JEDN;
 		stav = 0;
-		beziAkce = false;
 		
 		this.addKeyListener(new KeyListener() {
 			
@@ -146,27 +149,55 @@ public class DrawingPanel extends Component {
 					tlacitkoA = LOG_JEDN;
 					repaint();
 					Frame frame = new Frame();
-					if(tank1 > 0) {
+					if(beziAkce) {
+						zarovka = ZAROVKA_SVITI;
 						JOptionPane.showMessageDialog(frame,
-						    "Tank není prázdný. Nejdøíve se musí vypustit",
+							    "Zrovna se sanitarizuje jeden z tanku.\nPockejte prosim az dobehne akce do konce.",
+							    "Warning",
+							    JOptionPane.WARNING_MESSAGE);
+						tlacitkoA = LOG_NULA;
+						zarovka = ZAROVKA_ZHASLA;
+						return;
+					}
+					if(tank1 > 0) {
+						zarovka = ZAROVKA_SVITI;
+						JOptionPane.showMessageDialog(frame,
+						    "Tank neni prazdny. Nejdrive se musi vypustit",
 						    "Warning",
 						    JOptionPane.WARNING_MESSAGE);
+						tlacitkoA = LOG_NULA;
+						zarovka = ZAROVKA_ZHASLA;
 						return;
 					}
 					stav = 1;
+					beziAkce = true;
 				}
 				if (e.getKeyChar() == 'B' || e.getKeyChar() == 'b') {
 					tlacitkoB = LOG_JEDN;
 					repaint();
 					Frame frame = new Frame();
-					if(tank2 > 0) {
+					if(beziAkce) {
+						zarovka = ZAROVKA_SVITI;
 						JOptionPane.showMessageDialog(frame,
-						    "Tank není prázdný. Nejdøíve se musí vypustit",
+							    "Zrovna se sanitarizuje jeden z tanku.\nPockejte prosim az dobehne akce do konce.",
+							    "Warning",
+							    JOptionPane.WARNING_MESSAGE);
+						tlacitkoB = LOG_NULA;
+						zarovka = ZAROVKA_ZHASLA;
+						return;
+					}
+					if(tank2 > 0) {
+						zarovka = ZAROVKA_SVITI;
+						JOptionPane.showMessageDialog(frame,
+						    "Tank neni prazdny. Nejdrive se musi vypustit",
 						    "Warning",
 						    JOptionPane.WARNING_MESSAGE);
+						tlacitkoB = LOG_NULA;
+						zarovka = ZAROVKA_ZHASLA;
 						return;
 					}
 					stav = 6;
+					beziAkce = true;
 				}
 				if (e.getKeyChar() == '1') {
 					V1 = LOG_JEDN;
@@ -219,7 +250,7 @@ public class DrawingPanel extends Component {
 		font = g2.getFontMetrics();
 		g2.setColor(Color.WHITE);
 		g2.fillRect(0, 0, this.getWidth(), this.getHeight());
-		g2.setColor(Color.BLACK);
+		g2.setColor(CARA);
 		g2.setStroke(new BasicStroke(SIRKA_CARY));
 		g2.drawLine(50, 50, 200, 50);
 		g2.drawString("Louh", 200 - font.stringWidth("Louh") / 2, 40);
@@ -262,7 +293,7 @@ public class DrawingPanel extends Component {
 		//cerpadlo
 		g2.setColor(cerpadlo);
 		g2.fillOval(85, 425, 30, 30);
-		g2.setColor(Color.BLACK);
+		g2.setColor(CARA);
 		g2.drawOval(85, 425, 30, 30);
 		g2.drawString("P", 110 - font.stringWidth("P"), 480);
 		AffineTransform oldTr = g2.getTransform();
@@ -275,23 +306,23 @@ public class DrawingPanel extends Component {
 		//Kontrola ph
 		g2.setColor(ph);
 		g2.fillOval(490, 410, 20, 20);
-		g2.setColor(Color.BLACK);
+		g2.setColor(CARA);
 		g2.drawOval(490, 410, 20, 20);
 		g2.drawString("Q - ph", 510 - font.stringWidth("Q - ph")/2, 400);
 		drawOvladaciPanel(g2, 400, 50, tlacitkoA, tlacitkoB);
 	}
 	
 	/**
-	 * Metoda kreslí šipku
-	 * @param x1 x-ová souøadnice zaèátku šipky 
-	 * @param y1 y-ová souøadnice zaèátku šipky
-	 * @param x2 x-ová souøadnice konce šipky
-	 * @param y2 y-ová souøadnice konce šipky
+	 * Metoda kresli sipku
+	 * @param x1 x-ova souradnice zacatku sipky 
+	 * @param y1 y-ova souradnice zacatku sipky
+	 * @param x2 x-ova souradnice konce sipky
+	 * @param y2 y-ova souradnice konce sipky
 	 * @param g2 Grafika
 	 */
 	private void drawArrow(double x1, double y1, double x2, double y2, Graphics2D g2) {
 
-		g2.setColor(Color.BLACK);
+		g2.setColor(CARA);
 		g2.setStroke(new BasicStroke(SIRKA_CARY, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
 		
 		//vypocet U
@@ -323,16 +354,16 @@ public class DrawingPanel extends Component {
 	}
 	
 	/**
-	 * Metoda kreslí ventil
+	 * Metoda kresli ventil
 	 * @param g2 Grafika
-	 * @param x x-ová souøadnice ventilu
-	 * @param y y-ová souøadnice ventilu
-	 * @param color barva(stav) ventilu, Zelená = ventil otevøen, Èervená = ventil zavøen
+	 * @param x x-ova souradnice ventilu
+	 * @param y y-ova souradnice ventilu
+	 * @param color barva(stav) ventilu, Zelena = ventil otevren, Cervena = ventil zavren
 	 * @param text nazev ventilu 
 	 */
 	private void drawVentil(Graphics2D g2, int x, int y, Color color, String text) {
 		g2.setStroke(new BasicStroke(SIRKA_CARY));
-		g2.setColor(Color.black);
+		g2.setColor(CARA);
 		g2.drawLine(x, y, x + SIRKA_VENTILU, y);
 		g2.drawLine(x, y + VYSKA_VENTILU, x + SIRKA_VENTILU, y + VYSKA_VENTILU);
 		g2.drawLine(x, y, x + SIRKA_VENTILU, y + VYSKA_VENTILU);
@@ -340,19 +371,19 @@ public class DrawingPanel extends Component {
 		g2.drawLine(x + SIRKA_VENTILU/2, y + VYSKA_VENTILU/2, x + SIRKA_VENTILU, y + VYSKA_VENTILU/2);
 		g2.setColor(color);
 		g2.fillOval(x + SIRKA_VENTILU, (y + VYSKA_VENTILU/2) - (int)(VYSKA_VENTILU/1.5)/2, (int)(VYSKA_VENTILU/1.5), (int)(VYSKA_VENTILU/1.5));
-		g2.setColor(Color.BLACK);
+		g2.setColor(CARA);
 		g2.drawOval(x + SIRKA_VENTILU, (y + VYSKA_VENTILU/2) - (int)(VYSKA_VENTILU/1.5)/2, (int)(VYSKA_VENTILU/1.5), (int)(VYSKA_VENTILU/1.5));
 		g2.setStroke(new BasicStroke(SIRKA_CARY));
 		g2.drawString(text, x + SIRKA_VENTILU + VYSKA_VENTILU - font.stringWidth(text)/4, y + font.getHeight() / 4 + VYSKA_VENTILU / 2);
 	}
 	
 	/**
-	 * Metoda kreslí tank
+	 * Metoda kresli tank
 	 * @param g2 grafika
 	 * @param x x-ova souradnice 
-	 * @param y y-ova souøadnice
-	 * @param color1 barva horniho senzoru, který znaèí stav
-	 * @param color2 barva spodniho senzoru, který znaèí stav
+	 * @param y y-ova souradnice
+	 * @param color1 barva horniho senzoru, ktery znaci stav
+	 * @param color2 barva spodniho senzoru, ktery znaci stav
 	 * @param vyskaNaplne jak je tank naplnen
 	 * @param napln co je v tanku (LIH, VODA, NIC), podle tohoto se urcuje barva kterou je napln obarvena
 	 * @param sensorH horni senzor
@@ -366,7 +397,7 @@ public class DrawingPanel extends Component {
 		g2.setColor(kapalina);
 		g2.fillRect(x,(int)(y + ((100 - vyskaNaplne) / 100.0) * VYSKA_TANKU), SIRKA_TANKU, (int)((vyskaNaplne / 100.0) * VYSKA_TANKU));
 		//Kresleni tanku
-		g2.setColor(Color.BLACK);
+		g2.setColor(CARA);
 		g2.drawRect(x, y, SIRKA_TANKU, VYSKA_TANKU);
 		g2.drawLine(x, (int)(y + (1.0/4.0 * VYSKA_TANKU)), x - 10, (int)(y + (1.0/4.0 * VYSKA_TANKU)));
 		g2.drawLine(x, (int)(y + (3.0/4.0 * VYSKA_TANKU)), x - 10, (int)(y + (3.0/4.0 * VYSKA_TANKU)));
@@ -374,7 +405,7 @@ public class DrawingPanel extends Component {
 		g2.fillOval(x - (10 + (int)(VYSKA_VENTILU/1.5)), (int)(y + (1.0/4.0 * VYSKA_TANKU)) - (int)(VYSKA_VENTILU/1.5)/2, (int)(VYSKA_VENTILU/1.5), (int)(VYSKA_VENTILU/1.5));
 		g2.setColor(color2);
 		g2.fillOval(x - (10 + (int)(VYSKA_VENTILU/1.5)), (int)(y + (3.0/4.0 * VYSKA_TANKU)) - (int)(VYSKA_VENTILU/1.5)/2, (int)(VYSKA_VENTILU/1.5), (int)(VYSKA_VENTILU/1.5));
-		g2.setColor(Color.BLACK);
+		g2.setColor(CARA);
 		g2.drawOval(x - (10 + (int)(VYSKA_VENTILU/1.5)), (int)(y + (1.0/4.0 * VYSKA_TANKU)) - (int)(VYSKA_VENTILU/1.5)/2, (int)(VYSKA_VENTILU/1.5), (int)(VYSKA_VENTILU/1.5));
 		g2.drawOval(x - (10 + (int)(VYSKA_VENTILU/1.5)), (int)(y + (3.0/4.0 * VYSKA_TANKU)) - (int)(VYSKA_VENTILU/1.5)/2, (int)(VYSKA_VENTILU/1.5), (int)(VYSKA_VENTILU/1.5));
 		g2.drawString(sensorH, x - (10 + (int)(VYSKA_VENTILU/1.5)) - 30, (int)(y + (1.0/4.0 * VYSKA_TANKU)) - (int)(VYSKA_VENTILU/1.5)/2 - 5);
@@ -394,19 +425,19 @@ public class DrawingPanel extends Component {
 		//A
 		g2.setColor(colorA);
 		g2.fillOval(x + VELIKOST_OP/3 - VELIKOST_KONTROLKY + 10, y + 10, VELIKOST_KONTROLKY, VELIKOST_KONTROLKY);
-		g2.setColor(Color.BLACK);
+		g2.setColor(CARA);
 		g2.drawOval(x + VELIKOST_OP/3 - VELIKOST_KONTROLKY + 10, y + 10, VELIKOST_KONTROLKY, VELIKOST_KONTROLKY);
 		g2.drawString("A", x + VELIKOST_OP/4 - font.stringWidth("A")/2, y + VELIKOST_KONTROLKY + 30);
 		//B
 		g2.setColor(colorB);
 		g2.fillOval(x + 2 * VELIKOST_OP/3 - 10, y + 10, VELIKOST_KONTROLKY, VELIKOST_KONTROLKY);
-		g2.setColor(Color.BLACK);
+		g2.setColor(CARA);
 		g2.drawOval(x + 2 * VELIKOST_OP/3 - 10, y + 10, VELIKOST_KONTROLKY, VELIKOST_KONTROLKY);
 		g2.drawString("B", x + 3 * VELIKOST_OP/4 - font.stringWidth("B")/2, y + VELIKOST_KONTROLKY + 30);
 		//Zarovka
 		g2.setColor(zarovka);
 		g2.fillOval(x + VELIKOST_OP/2 - VELIKOST_KONTROLKY/2, y + VELIKOST_OP/2 + VELIKOST_KONTROLKY/2 - 10, VELIKOST_KONTROLKY, VELIKOST_KONTROLKY);
-		g2.setColor(Color.BLACK);
+		g2.setColor(CARA);
 		g2.drawOval(x + VELIKOST_OP/2 - VELIKOST_KONTROLKY/2, y + VELIKOST_OP/2 + VELIKOST_KONTROLKY/2 - 10, VELIKOST_KONTROLKY, VELIKOST_KONTROLKY);
 		g2.drawString("Z", x + VELIKOST_OP/2 - font.stringWidth("Z")/2, y + VELIKOST_OP + VELIKOST_TEXTU / 2);
 	}
@@ -571,6 +602,7 @@ public class DrawingPanel extends Component {
 			stav = 0;
 			V3 = LOG_NULA;
 			V7 = LOG_NULA;
+			beziAkce = false;
 		}
 	}
 	
@@ -648,6 +680,7 @@ public class DrawingPanel extends Component {
 			stav = 0;
 			V6 = LOG_NULA;
 			V7 = LOG_NULA;
+			beziAkce = false;
 		}
 	}
 	
