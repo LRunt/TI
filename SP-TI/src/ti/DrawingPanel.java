@@ -40,6 +40,8 @@ public class DrawingPanel extends Component {
 	/** Pri kolika procentech naplneni bude mit dolni cidlo tanku logickou jednicku*/
 	private final int DOLNI_CIDLO = 1; 
 	private FontMetrics font;
+	/** zda jsou filtrovany tanky */
+	private boolean beziAkce;
 	
 	private Color tlacitkoA;
 	private Color tlacitkoB;
@@ -87,6 +89,7 @@ public class DrawingPanel extends Component {
 		cerpadlo = LOG_NULA;
 		ph = LOG_JEDN;
 		stav = 0;
+		beziAkce = false;
 		
 		this.addKeyListener(new KeyListener() {
 			
