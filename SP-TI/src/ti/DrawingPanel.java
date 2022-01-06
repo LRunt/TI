@@ -141,6 +141,10 @@ public class DrawingPanel extends Component {
 					V7 = LOG_NULA;
 					repaint();
 				}
+				if (e.getKeyChar() == 'P' || e.getKeyChar() == 'p') {
+					cerpadlo = LOG_NULA;
+					repaint();
+				}
 			}
 			
 			@Override
@@ -148,23 +152,16 @@ public class DrawingPanel extends Component {
 				if (e.getKeyChar() == 'A' || e.getKeyChar() == 'a') {
 					tlacitkoA = LOG_JEDN;
 					repaint();
-					Frame frame = new Frame();
 					if(beziAkce) {
 						zarovka = ZAROVKA_SVITI;
-						JOptionPane.showMessageDialog(frame,
-							    "Zrovna se sanitarizuje jeden z tanku.\nPockejte prosim az dobehne akce do konce.",
-							    "Warning",
-							    JOptionPane.WARNING_MESSAGE);
+						vypisChybu("Warning", "Zrovna se sanitarizuje jeden z tanku.\nPockejte prosim az dobehne akce do konce.");
 						tlacitkoA = LOG_NULA;
 						zarovka = ZAROVKA_ZHASLA;
 						return;
 					}
 					if(tank1 > 0) {
 						zarovka = ZAROVKA_SVITI;
-						JOptionPane.showMessageDialog(frame,
-						    "Tank neni prazdny. Nejdrive se musi vypustit",
-						    "Warning",
-						    JOptionPane.WARNING_MESSAGE);
+						vypisChybu("Warning", "Tank neni prazdny. Nejdrive se musi vypustit");
 						tlacitkoA = LOG_NULA;
 						zarovka = ZAROVKA_ZHASLA;
 						return;
@@ -175,23 +172,16 @@ public class DrawingPanel extends Component {
 				if (e.getKeyChar() == 'B' || e.getKeyChar() == 'b') {
 					tlacitkoB = LOG_JEDN;
 					repaint();
-					Frame frame = new Frame();
 					if(beziAkce) {
 						zarovka = ZAROVKA_SVITI;
-						JOptionPane.showMessageDialog(frame,
-							    "Zrovna se sanitarizuje jeden z tanku.\nPockejte prosim az dobehne akce do konce.",
-							    "Warning",
-							    JOptionPane.WARNING_MESSAGE);
+						vypisChybu("Warning", "Zrovna se sanitarizuje jeden z tanku.\nPockejte prosim az dobehne akce do konce.");
 						tlacitkoB = LOG_NULA;
 						zarovka = ZAROVKA_ZHASLA;
 						return;
 					}
 					if(tank2 > 0) {
 						zarovka = ZAROVKA_SVITI;
-						JOptionPane.showMessageDialog(frame,
-						    "Tank neni prazdny. Nejdrive se musi vypustit",
-						    "Warning",
-						    JOptionPane.WARNING_MESSAGE);
+						vypisChybu("Warning", "Tank neni prazdny. Nejdrive se musi vypustit");
 						tlacitkoB = LOG_NULA;
 						zarovka = ZAROVKA_ZHASLA;
 						return;
@@ -200,32 +190,60 @@ public class DrawingPanel extends Component {
 					beziAkce = true;
 				}
 				if (e.getKeyChar() == '1') {
-					V1 = LOG_JEDN;
-					repaint();
+					if(isOvladaniPovoleno()) {
+						V1 = LOG_JEDN;
+						manualniOvladani();
+						repaint();
+					}
 				}
 				if (e.getKeyChar() == '2') {
-					V2 = LOG_JEDN;
-					repaint();
+					if(isOvladaniPovoleno()) {
+						V2 = LOG_JEDN;
+						manualniOvladani();
+						repaint();
+					}
 				}
 				if (e.getKeyChar() == '3') {
-					V3 = LOG_JEDN;
-					repaint();
+					if(isOvladaniPovoleno()) {
+						V3 = LOG_JEDN;
+						manualniOvladani();
+						repaint();
+					}
 				}
 				if (e.getKeyChar() == '4') {
-					V4 = LOG_JEDN;
-					repaint();
+					if(isOvladaniPovoleno()) {
+						V4 = LOG_JEDN;
+						manualniOvladani();
+						repaint();
+					}
 				}
 				if (e.getKeyChar() == '5') {
-					V5 = LOG_JEDN;
-					repaint();
+					if(isOvladaniPovoleno()) {
+						V5 = LOG_JEDN;
+						manualniOvladani();
+						repaint();
+					}
 				}
 				if (e.getKeyChar() == '6') {
-					V6 = LOG_JEDN;
-					repaint();
+					if(isOvladaniPovoleno()) {
+						V6 = LOG_JEDN;
+						manualniOvladani();
+						repaint();
+					}
 				}
 				if (e.getKeyChar() == '7') {
-					V7 = LOG_JEDN;
-					repaint();
+					if(isOvladaniPovoleno()) {
+						V7 = LOG_JEDN;
+						manualniOvladani();
+						repaint();
+					}
+				}
+				if (e.getKeyChar() == 'P' || e.getKeyChar() == 'p') {
+					if(isOvladaniPovoleno()) {
+						cerpadlo = LOG_JEDN;
+						manualniOvladani();
+						repaint();
+					}
 				}
 			}
 		});
@@ -446,20 +464,6 @@ public class DrawingPanel extends Component {
 	 * Metoda aktrualizuje stav v modelu (vetsinou kontrola snimacu) 
 	 */
 	private void aktualizujStav() {
-		/*if(V1 == LOG_JEDN && V2 == LOG_JEDN) {
-			tank1 += RYCHLOST_PRUTOKU;
-			NTank1 = Napln.LIH;
-			if(tank1 > 100) {
-				tank1 = 100;
-			}
-		}*/
-		/*if(V3 == LOG_JEDN) {
-			tank1 -= rychlostPrutoku;
-			if(tank1 < 0) {
-				tank1 = 0;
-				NTank1 = Napln.NIC;
-			}
-		}*/
 		//tank1
 		if(tank1 > 100) tank1 = 100;
 		if(tank1 < 0) tank1 = 0;
@@ -684,4 +688,67 @@ public class DrawingPanel extends Component {
 		}
 	}
 	
+	private void manualniOvladani() {
+		if(V1 == LOG_JEDN && V2 == LOG_JEDN) {
+			tank1 += RYCHLOST_PRUTOKU;
+			NTank1 = Napln.LIH;
+			if(tank1 > 100) {
+				tank1 = 100;
+			}
+		}
+		if(V1 == LOG_JEDN && V5 == LOG_JEDN) {
+			tank2 += RYCHLOST_PRUTOKU;
+			NTank2 = Napln.LIH;
+			if(tank2 > 100) {
+				tank2 = 100;
+			}
+		}
+		if(V2 == LOG_JEDN && V4 == LOG_JEDN) {
+			tank1 += RYCHLOST_PRUTOKU;
+			NTank1 = Napln.VODA;
+			if(tank1 > 100) {
+				tank1 = 100;
+			}
+		}
+		if(V4 == LOG_JEDN && V5 == LOG_JEDN) {
+			/*if(tank2 > 0 && NTank2 != Napln.VODA) {
+				
+			}*/
+			tank2 += RYCHLOST_PRUTOKU;
+			NTank2 = Napln.VODA;
+			if(tank2 > 100) {
+				tank2 = 100;
+			}
+		}
+		if(V3 == LOG_JEDN && V7 == LOG_JEDN) {
+			tank1 -= RYCHLOST_PRUTOKU;
+			if(tank1 < 0) {
+				tank1 = 0;
+				NTank1 = Napln.NIC;
+			}
+		}
+		if(V6 == LOG_JEDN && V7 == LOG_JEDN) {
+			tank2 -= RYCHLOST_PRUTOKU;
+			if(tank2 < 0) {
+				tank2 = 0;
+				NTank1 = Napln.NIC;
+			}
+		}
+	}
+	
+	private boolean isOvladaniPovoleno() {
+		if(beziAkce) {
+			vypisChybu("Warning", "Bezi akce sanitace tanku. Manualni ovladani neni povoleno!");
+			return false;
+		}
+		return true;
+	}
+	
+	private void vypisChybu(String nazevOkna, String chybovaHlaska) {
+		Frame frame = new Frame();
+		JOptionPane.showMessageDialog(frame,
+			    chybovaHlaska,
+			    nazevOkna,
+			    JOptionPane.WARNING_MESSAGE);
+	}
 }
