@@ -5,7 +5,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
 
 import javax.swing.JOptionPane;
 
@@ -13,6 +12,7 @@ import javax.swing.JOptionPane;
  * @author Lukas Runt, Miroslav Vdoviak
  * @version 1.1 (06-01-2022)
  */
+@SuppressWarnings("serial")
 public class DrawingPanel extends Component {
 	private final double DELKA_HROTU = 20.0;
 	private final int SIRKA_VENTILU = 20;
@@ -536,11 +536,15 @@ public class DrawingPanel extends Component {
 	 * Stav, ve kterem se plni tank1 lihem
 	 */
 	private void stavA1() {
+		V1 = LOG_JEDN;
+		V2 = LOG_JEDN;
 		NTank1 = Napln.LIH;
 		tank1 += RYCHLOST_PRUTOKU;
 		repaint();
 		if(LA01 == LOG_JEDN) {
 			stav++;
+			V1 = LOG_NULA;
+			V2 = LOG_NULA;
 		}
 	}
 	
@@ -614,11 +618,15 @@ public class DrawingPanel extends Component {
 	 * Stav, ve kterem se plni tank2 lihem
 	 */
 	private void stavB1() {
+		V1 = LOG_JEDN;
+		V5 = LOG_JEDN;
 		NTank2 = Napln.LIH;
 		tank2 += RYCHLOST_PRUTOKU;
 		repaint();
 		if(LA03 == LOG_JEDN) {
 			stav++;
+			V1 = LOG_NULA;
+			V5 = LOG_NULA;
 		}
 	}
 	
@@ -688,8 +696,17 @@ public class DrawingPanel extends Component {
 		}
 	}
 	
+	/**
+	 * Metoda umoznuje manualni otevirani ventilu a ovladani cerpadla
+	 */
 	private void manualniOvladani() {
 		if(V1 == LOG_JEDN && V2 == LOG_JEDN) {
+			if(tank1 > 0 && NTank1 == Napln.VODA) {
+				vypisChybu("Warning", "Nelze michat lih s vodou!");
+				V1 = LOG_NULA;
+				V2 = LOG_NULA;
+				return;
+			}
 			tank1 += RYCHLOST_PRUTOKU;
 			NTank1 = Napln.LIH;
 			if(tank1 > 100) {
@@ -697,6 +714,12 @@ public class DrawingPanel extends Component {
 			}
 		}
 		if(V1 == LOG_JEDN && V5 == LOG_JEDN) {
+			if(tank2 > 0 && NTank2 == Napln.VODA) {
+				vypisChybu("Warning", "Nelze michat lih s vodou!");
+				V1 = LOG_NULA;
+				V5 = LOG_NULA;
+				return;
+			}
 			tank2 += RYCHLOST_PRUTOKU;
 			NTank2 = Napln.LIH;
 			if(tank2 > 100) {
@@ -704,6 +727,12 @@ public class DrawingPanel extends Component {
 			}
 		}
 		if(V2 == LOG_JEDN && V4 == LOG_JEDN) {
+			if(tank1 > 0 && NTank1 == Napln.LIH) {
+				vypisChybu("Warning", "Nelze michat vodu s lihem!");
+				V2 = LOG_NULA;
+				V4 = LOG_NULA;
+				return;
+			}
 			tank1 += RYCHLOST_PRUTOKU;
 			NTank1 = Napln.VODA;
 			if(tank1 > 100) {
@@ -711,9 +740,12 @@ public class DrawingPanel extends Component {
 			}
 		}
 		if(V4 == LOG_JEDN && V5 == LOG_JEDN) {
-			/*if(tank2 > 0 && NTank2 != Napln.VODA) {
-				
-			}*/
+			if(tank2 > 0 && NTank2 == Napln.LIH) {
+				vypisChybu("Warning", "Nelze michat vodu s lihem!");
+				V4 = LOG_NULA;
+				V5 = LOG_NULA;
+				return;
+			}
 			tank2 += RYCHLOST_PRUTOKU;
 			NTank2 = Napln.VODA;
 			if(tank2 > 100) {
@@ -721,6 +753,12 @@ public class DrawingPanel extends Component {
 			}
 		}
 		if(V3 == LOG_JEDN && V7 == LOG_JEDN) {
+			if(tank1 > 0 && NTank1 == Napln.LIH) {
+				vypisChybu("Warning", "Je zakazano vylevat lih potrubim!");
+				V3 = LOG_NULA;
+				V7 = LOG_NULA;
+				return;
+			}
 			tank1 -= RYCHLOST_PRUTOKU;
 			if(tank1 < 0) {
 				tank1 = 0;
@@ -728,14 +766,50 @@ public class DrawingPanel extends Component {
 			}
 		}
 		if(V6 == LOG_JEDN && V7 == LOG_JEDN) {
+			if(tank2 > 0 && NTank2 == Napln.LIH) {
+				vypisChybu("Warning", "Je zakazano vylevat lih potrubim!");
+				V6 = LOG_NULA;
+				V7 = LOG_NULA;
+				return;
+			}
 			tank2 -= RYCHLOST_PRUTOKU;
 			if(tank2 < 0) {
 				tank2 = 0;
+				NTank2 = Napln.NIC;
+			}
+		}
+		if(V6 == LOG_JEDN && cerpadlo == LOG_JEDN) {
+			if(tank2 > 0 && NTank2 == Napln.VODA) {
+				vypisChybu("Warning", "Nelze cerpat vodu k lihu!");
+				V6 = LOG_NULA;
+				cerpadlo = LOG_NULA;
+				return;
+			}
+			tank2 -= RYCHLOST_PRUTOKU;
+			if(tank2 < 0) {
+				tank2 = 0;
+				NTank2 = Napln.NIC;
+			}
+		}
+		if(V3 == LOG_JEDN && cerpadlo == LOG_JEDN) {
+			if(tank1 > 0 && NTank1 == Napln.VODA) {
+				vypisChybu("Warning", "Nelze cerpat vodu k lihu!");
+				V6 = LOG_NULA;
+				cerpadlo = LOG_NULA;
+				return;
+			}
+			tank1 -= RYCHLOST_PRUTOKU;
+			if(tank1 < 0) {
+				tank1 = 0;
 				NTank1 = Napln.NIC;
 			}
 		}
 	}
 	
+	/**
+	 * Metoda testuje zda je manualni ovladani povoleno
+	 * @return Maualni ovladani povoleno true/false
+	 */
 	private boolean isOvladaniPovoleno() {
 		if(beziAkce) {
 			vypisChybu("Warning", "Bezi akce sanitace tanku. Manualni ovladani neni povoleno!");
@@ -744,6 +818,11 @@ public class DrawingPanel extends Component {
 		return true;
 	}
 	
+	/**
+	 * Vypis chyby 
+	 * @param nazevOkna jak se bude jmenovat okno
+	 * @param chybovaHlaska co bude vypsano v okne
+	 */
 	private void vypisChybu(String nazevOkna, String chybovaHlaska) {
 		Frame frame = new Frame();
 		JOptionPane.showMessageDialog(frame,
