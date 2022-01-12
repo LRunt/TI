@@ -38,9 +38,44 @@
 
 \section{Automatový model}
 
+\subsection{Stavy}
+STAV 0 - Systém není v činnosti \newline 
+STAV 1 - Tank A se napouští lihem \newline 
+STAV 2 - Tanku A se přečerpává čerpadlem \newline 
+STAV 3 - Tank A se plní vodou \newline 
+STAV 4 - Tank A se proplachuje dokud není ph v normálu \newline 
+STAV 5 - Tank A se vypouští \newline 
+STAV 6 - Tank B se napouští lihem \newline 
+STAV 7 - Tanku B se přečerpává čerpadlem \newline 
+STAV 8 - Tank B se plní vodou \newline 
+STAV 9 - Tank B se proplachuje dokud není ph v normálu \newline 
+STAV 10 - Tank B se vypouští 
+
+\subsection{Snímače}
+LA011 - Hladina dosahuje maxima tanku A \newline 
+LA010 - Hladina nedosahuje maxima tanku A \newline 
+LA021 - Hladina dosahuje minima tanku A \newline 
+LA020 - Hladina nedosahuje minima tanku A \newline 
+LA031 - Hladina dosahuje maxima tanku B \newline
+LA030 - Hladina nedosahuje maxima tanku B \newline 
+LA041 - Hladina nedosahuje minima tanku B \newline 
+LA040 - Hladina dosahuje minima tanku B
+
+\subsection{Řídící signály}
+P0 - Čerpadlo vyplé \newline 
+P1 - Čerpadlo zaplé \newline 
+Vi0 - Ventil i zavřen \newline 
+Vi1 - Ventil i otevřen \newline 
+Q0 - Ph nad požadovanou mezí \newline 
+Q1 - Ph pod požadovanou mezí 
+
+\subsection{Řízení operátora}
+A - Sanitace tanku A \newline 
+B - Sanitace tanku B \newline 
+Z - Žárovka
+
 \section{Implementace}
 
-\newpage
 \section{Uživatelská příručka}
 
 \subsection{Spuštění programu}
