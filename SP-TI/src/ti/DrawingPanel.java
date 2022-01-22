@@ -51,10 +51,10 @@ public class DrawingPanel extends Component {
 	private Color tlacitkoB;
 	private Color zarovka;
 	private Color V1;
-	private Color V2;
 	private Color V3;
-	private Color V4;
 	private Color V5;
+	private Color V2;
+	private Color V4;
 	private Color V6;
 	private Color V7;
 	private Color LA01;
@@ -84,10 +84,10 @@ public class DrawingPanel extends Component {
 		tlacitkoB = LOG_NULA;
 		zarovka = ZAROVKA_ZHASLA;
 		V1 = LOG_NULA;
-		V2 = LOG_NULA;
 		V3 = LOG_NULA;
-		V4 = LOG_NULA;
 		V5 = LOG_NULA;
+		V2 = LOG_NULA;
+		V4 = LOG_NULA;
 		V6 = LOG_NULA;
 		V7 = LOG_NULA;
 		cerpadlo = LOG_NULA;
@@ -117,20 +117,20 @@ public class DrawingPanel extends Component {
 					V1 = LOG_NULA;
 					repaint();
 				}
-				if (e.getKeyChar() == '2') {
-					V2 = LOG_NULA;
-					repaint();
-				}
 				if (e.getKeyChar() == '3') {
 					V3 = LOG_NULA;
 					repaint();
 				}
-				if (e.getKeyChar() == '4') {
-					V4 = LOG_NULA;
-					repaint();
-				}
 				if (e.getKeyChar() == '5') {
 					V5 = LOG_NULA;
+					repaint();
+				}
+				if (e.getKeyChar() == '2') {
+					V2 = LOG_NULA;
+					repaint();
+				}
+				if (e.getKeyChar() == '4') {
+					V4 = LOG_NULA;
 					repaint();
 				}
 				if (e.getKeyChar() == '6') {
@@ -196,13 +196,6 @@ public class DrawingPanel extends Component {
 						repaint();
 					}
 				}
-				if (e.getKeyChar() == '2') {
-					if(isOvladaniPovoleno()) {
-						V2 = LOG_JEDN;
-						manualniOvladani();
-						repaint();
-					}
-				}
 				if (e.getKeyChar() == '3') {
 					if(isOvladaniPovoleno()) {
 						V3 = LOG_JEDN;
@@ -210,16 +203,23 @@ public class DrawingPanel extends Component {
 						repaint();
 					}
 				}
-				if (e.getKeyChar() == '4') {
+				if (e.getKeyChar() == '5') {
 					if(isOvladaniPovoleno()) {
-						V4 = LOG_JEDN;
+						V5 = LOG_JEDN;
 						manualniOvladani();
 						repaint();
 					}
 				}
-				if (e.getKeyChar() == '5') {
+				if (e.getKeyChar() == '2') {
 					if(isOvladaniPovoleno()) {
-						V5 = LOG_JEDN;
+						V2 = LOG_JEDN;
+						manualniOvladani();
+						repaint();
+					}
+				}
+				if (e.getKeyChar() == '4') {
+					if(isOvladaniPovoleno()) {
+						V4 = LOG_JEDN;
 						manualniOvladani();
 						repaint();
 					}
@@ -285,19 +285,19 @@ public class DrawingPanel extends Component {
 		g2.drawLine(200, 180, 200, 200);
 		g2.drawLine(180, 200, 325, 200);
 		g2.drawLine(180, 200, 180, 220);
-		drawVentil(g2, 170, 220, V2, "V2");
+		drawVentil(g2, 170, 220, V3, "V3");
 		g2.drawLine(180, 250, 180, 270);
 		drawTank(g2, 180 - SIRKA_TANKU/2, 270, LA01, LA02, tank1, NTank1, "LA01", "LA02");
 		g2.drawLine(180, 370, 180, 390);
-		drawVentil(g2, 180 - SIRKA_VENTILU/2, 390, V3, "V3");
+		drawVentil(g2, 180 - SIRKA_VENTILU/2, 390, V5, "V5");
 		g2.drawLine(180, 420, 180, 440);
 		g2.drawLine(300, 200, 300, 180);
-		drawVentil(g2, 300 - SIRKA_VENTILU/2, 150, V4, "V4");	
+		drawVentil(g2, 300 - SIRKA_VENTILU/2, 150, V2, "V2");	
 		g2.drawLine(300, 150, 300, 80);
 		g2.drawString("Voda", 300 - font.stringWidth("Voda") / 2, 40);
 		drawArrow(300, 80, 300, 50, g2);
 		g2.drawLine(325, 200, 325, 220);
-		drawVentil(g2, 325 - SIRKA_VENTILU/2, 220, V5, "V5");
+		drawVentil(g2, 325 - SIRKA_VENTILU/2, 220, V4, "V4");
 		g2.drawLine(325, 250, 325, 270);
 		drawTank(g2, 325 - SIRKA_TANKU/2, 270, LA03, LA04, tank2, NTank2, "LA03", "LA04");
 		g2.drawLine(325, 370, 325, 390);
@@ -537,14 +537,14 @@ public class DrawingPanel extends Component {
 	 */
 	private void stavA1() {
 		V1 = LOG_JEDN;
-		V2 = LOG_JEDN;
+		V3 = LOG_JEDN;
 		NTank1 = Napln.LIH;
 		tank1 += RYCHLOST_PRUTOKU;
 		repaint();
 		if(LA01 == LOG_JEDN) {
 			stav++;
 			V1 = LOG_NULA;
-			V2 = LOG_NULA;
+			V3 = LOG_NULA;
 		}
 	}
 	
@@ -553,13 +553,13 @@ public class DrawingPanel extends Component {
 	 */
 	private void stavA2() {
 		cerpadlo = LOG_JEDN;
-		V3 = LOG_JEDN;
+		V5 = LOG_JEDN;
 		tank1 -= RYCHLOST_PRUTOKU;
 		repaint();
 		if(LA02 == LOG_NULA) {
 			stav++;
 			cerpadlo = LOG_NULA;
-			V3 = LOG_NULA;
+			V5 = LOG_NULA;
 		}
 	}
 	
@@ -568,14 +568,14 @@ public class DrawingPanel extends Component {
 	 */
 	private void stavA3() {
 		NTank1 = Napln.VODA;
+		V3 = LOG_JEDN;
 		V2 = LOG_JEDN;
-		V4 = LOG_JEDN;
 		repaint();
 		tank1 += RYCHLOST_PRUTOKU;
 		if(LA01 == LOG_JEDN) {
 			stav++;
+			V3 = LOG_NULA;
 			V2 = LOG_NULA;
-			V4 = LOG_NULA;
 			phTanku = 100;
 		}
 	}
@@ -584,7 +584,7 @@ public class DrawingPanel extends Component {
 	 * Stav, ve kterem se proplachuje tank1 vodou dokud neni ph v norme 
 	 */
 	private void stavA4() {
-		V3 = LOG_JEDN;
+		V5 = LOG_JEDN;
 		V7 = LOG_JEDN;
 		ph = LOG_NULA;
 		phTanku -= 1;
@@ -602,13 +602,13 @@ public class DrawingPanel extends Component {
 	 * Vypousteni zbytku vody z tanku1
 	 */
 	private void stavA5() {
-		V3 = LOG_JEDN;
+		V5 = LOG_JEDN;
 		V7 = LOG_JEDN;
 		tank1 -= RYCHLOST_PRUTOKU;
 		repaint();
 		if(LA02 == LOG_NULA) {
 			stav = 0;
-			V3 = LOG_NULA;
+			V5 = LOG_NULA;
 			V7 = LOG_NULA;
 			beziAkce = false;
 		}
@@ -619,14 +619,14 @@ public class DrawingPanel extends Component {
 	 */
 	private void stavB1() {
 		V1 = LOG_JEDN;
-		V5 = LOG_JEDN;
+		V4 = LOG_JEDN;
 		NTank2 = Napln.LIH;
 		tank2 += RYCHLOST_PRUTOKU;
 		repaint();
 		if(LA03 == LOG_JEDN) {
 			stav++;
 			V1 = LOG_NULA;
-			V5 = LOG_NULA;
+			V4 = LOG_NULA;
 		}
 	}
 	
@@ -650,14 +650,14 @@ public class DrawingPanel extends Component {
 	 */
 	private void stavB3() {
 		NTank2 = Napln.VODA;
+		V2 = LOG_JEDN;
 		V4 = LOG_JEDN;
-		V5 = LOG_JEDN;
 		repaint();
 		tank2 += RYCHLOST_PRUTOKU;
 		if(LA03 == LOG_JEDN) {
 			stav++;
+			V2 = LOG_NULA;
 			V4 = LOG_NULA;
-			V5 = LOG_NULA;
 			phTanku = 100;
 		}
 	}
@@ -700,11 +700,11 @@ public class DrawingPanel extends Component {
 	 * Metoda umoznuje manualni otevirani ventilu a ovladani cerpadla
 	 */
 	private void manualniOvladani() {
-		if(V1 == LOG_JEDN && V2 == LOG_JEDN) {
+		if(V1 == LOG_JEDN && V3 == LOG_JEDN) {
 			if(tank1 > 0 && NTank1 == Napln.VODA) {
 				vypisChybu("Warning", "Nelze michat lih s vodou!");
 				V1 = LOG_NULA;
-				V2 = LOG_NULA;
+				V3 = LOG_NULA;
 				return;
 			}
 			tank1 += RYCHLOST_PRUTOKU;
@@ -713,11 +713,11 @@ public class DrawingPanel extends Component {
 				tank1 = 100;
 			}
 		}
-		if(V1 == LOG_JEDN && V5 == LOG_JEDN) {
+		if(V1 == LOG_JEDN && V4 == LOG_JEDN) {
 			if(tank2 > 0 && NTank2 == Napln.VODA) {
 				vypisChybu("Warning", "Nelze michat lih s vodou!");
 				V1 = LOG_NULA;
-				V5 = LOG_NULA;
+				V4 = LOG_NULA;
 				return;
 			}
 			tank2 += RYCHLOST_PRUTOKU;
@@ -726,11 +726,11 @@ public class DrawingPanel extends Component {
 				tank2 = 100;
 			}
 		}
-		if(V2 == LOG_JEDN && V4 == LOG_JEDN) {
+		if(V3 == LOG_JEDN && V2 == LOG_JEDN) {
 			if(tank1 > 0 && NTank1 == Napln.LIH) {
 				vypisChybu("Warning", "Nelze michat vodu s lihem!");
+				V3 = LOG_NULA;
 				V2 = LOG_NULA;
-				V4 = LOG_NULA;
 				return;
 			}
 			tank1 += RYCHLOST_PRUTOKU;
@@ -739,11 +739,11 @@ public class DrawingPanel extends Component {
 				tank1 = 100;
 			}
 		}
-		if(V4 == LOG_JEDN && V5 == LOG_JEDN) {
+		if(V2 == LOG_JEDN && V4 == LOG_JEDN) {
 			if(tank2 > 0 && NTank2 == Napln.LIH) {
 				vypisChybu("Warning", "Nelze michat vodu s lihem!");
+				V2 = LOG_NULA;
 				V4 = LOG_NULA;
-				V5 = LOG_NULA;
 				return;
 			}
 			tank2 += RYCHLOST_PRUTOKU;
@@ -752,10 +752,10 @@ public class DrawingPanel extends Component {
 				tank2 = 100;
 			}
 		}
-		if(V3 == LOG_JEDN && V7 == LOG_JEDN) {
+		if(V5 == LOG_JEDN && V7 == LOG_JEDN) {
 			if(tank1 > 0 && NTank1 == Napln.LIH) {
 				vypisChybu("Warning", "Je zakazano vylevat lih potrubim!");
-				V3 = LOG_NULA;
+				V5 = LOG_NULA;
 				V7 = LOG_NULA;
 				return;
 			}
@@ -791,7 +791,7 @@ public class DrawingPanel extends Component {
 				NTank2 = Napln.NIC;
 			}
 		}
-		if(V3 == LOG_JEDN && cerpadlo == LOG_JEDN) {
+		if(V5 == LOG_JEDN && cerpadlo == LOG_JEDN) {
 			if(tank1 > 0 && NTank1 == Napln.VODA) {
 				vypisChybu("Warning", "Nelze cerpat vodu k lihu!");
 				V6 = LOG_NULA;
