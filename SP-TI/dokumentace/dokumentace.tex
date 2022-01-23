@@ -17,10 +17,14 @@
 {\LARGE Logické řízení - sanitace nádrží}
 \vspace{1cm} 
 
-\Large Lukáš Runt (A20B0226P), Miroslav Vdoviak (A20B....)
-\vspace{0.5cm} 
+\Large Lukáš Runt (A20B0226P)
 
-\large \itshape lrunt@students.zcu.cz, lrunt@students.zcu.cz
+\large {\itshape lrunt@students.zcu.cz}
+
+\vspace{0.1cm}
+\Large Miroslav Vdoviak (A20B0268P)
+
+\large \itshape{miravdov@students.zcu.cz}
 }
 \date{\vspace{6cm} \today}
 
@@ -75,12 +79,21 @@ A - Sanitace tanku A \newline
 B - Sanitace tanku B \newline 
 Z - Žárovka
 
+\subsection{Přechodový graf}
+\begin{figure}
+\centering 
+\includegraphics[width=14cm]{prechodovyAutomat}
+\caption{Přechodový graf automatu}
+\end{figure}
+
+\subsection{Chybové stavy} \label{chyba}
+
 \section{Implementace}
 
 \section{Uživatelská příručka}
 
 \subsection{Spuštění programu}
-Před spuštěním programu musíme nejprve zkontrolovat, zda se nacházíme ve stejné složce, jako je právě soubor semestralkaTI.jar. Tento program spustíme v příkazové řádce příkazem: \texttt{java -jar semestralkaTI.jar}. Pro spuštění je předpokladem mít nainstalovanou javu verze nejméně 11.
+Aplikace se spoští pomocí příkazu v příkazové řádce. Před zadáním příkazu se musíme ujistit, zda se nacházíme ve stejné složce, jako jar soubor, který se chystáme spustit (\texttt{semestralkaTI.jar}). Aplikaci poté spustíme pomocí příkazu: \texttt{java -jar semestralkaTI.jar}. Pro spuštění je předpokladem mít nainstalovanou Javu verze nejméně 11. Odkaz ke stažení Javy 11: \url{ https://www.oracle.com/java/technologies/downloads/#java11}
 
 \begin{figure}[h]
 \centering 
@@ -88,16 +101,23 @@ Před spuštěním programu musíme nejprve zkontrolovat, zda se nacházíme ve 
 \caption{Příklad spuštění}
 \end{figure}
 
-Pokud se program podaří spustit zobrazí se model sanitarizace tanků.
+Pokud se program podaří spustit zobrazí se model sanitarizace tanků \ref{vzhled}.
 
 \begin{figure}
 \centering 
-\includegraphics[width=10cm]{vzhledAplikace}
+\includegraphics[width=10cm]{pospusteni}
 \caption{Vzhled aplikace po spuštění}
+\label{vzhled}
 \end{figure}
 
-\subsection{Ovládání}
-Program se ovládá pomocí klávesnice: \newline 
+\subsection{Ovládání aplikace}
+Po spuštění se zobrazí model ve stavu 0. Červená barva znamená logicloku 0, tedy ventil je zavřené, tlačítko není stlačeno, ph není v požadované mezi, čerpadlo nečerpá líh, hladina v tanku není výš než snímač. Zelená barva znamená naopak logickou 1, tedy ventil je otevřený, tlačítko je stlačeno, atd. Žárovka má své barvy a to šedou pokud nesvítí a žlutou pokud svítí. Voda je znázorněna modrou barvou a líh barvou šedou.
+
+Aplikace se ovládá pomocí klávesnice. Uživatel má k dispozici ovládací panel (Spouštění sanitarizace nádrží) a manuální ovládání, které zahrnuje ovládání jednotlivých ventilů a čerpadla. Při implementaci byla snaha o intuitivní ovládání, tedy ventily se ovládájí pomící jejich čísla, ostatní prvky se ovládají pomocí písmenka, kterým je daný prvek pojmenovaný. Podrobný výčet ovládání je uveden níže \ref{ovladani}.
+
+Aplikace počítá s neobvyklým zacházením. Jsou tedy ošetřeny stavy, při kterých by mohlo dojít k chybě. Při chybovém stavu vyskočí na uživatele upozornění a v modelu se rozsvítí žárovka. Výčet chybových stavů lze najít zde: \ref{chyba}
+
+\subsubsection{Výčet ovládacích kláves} \label{ovladani}
 A - Spuštění sanitarizace tanku A \newline 
 B - Spuštění sanitarizace tanku B \newline 
 P - Manuální spuštění čerpadla \newline 
@@ -108,7 +128,6 @@ P - Manuální spuštění čerpadla \newline
 5 - Manuální otevření ventilu 5 \newline 
 6 - Manuální otevření ventilu 6 \newline 
 7 - Manuální otevření ventilu 7 \newline 
-
 
 \section{Závěr}
 Celkovou práci hodnotím pozitivně, neboť jsem si vyzkoušel napsat konečný automat. Byl to pro mne nepopsatelný zážitek, který mě studijně obohatil a posunul o krok blíže k praktickým aplikacím teoreticky získaných vědomostí. 
