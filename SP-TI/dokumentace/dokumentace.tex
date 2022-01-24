@@ -5,6 +5,7 @@
 \usepackage [czech]{babel}
 \usepackage{graphicx}
 \usepackage[numbib]{tocbibind}
+\usepackage{subcaption}
 %\usepackage{hyperref}
 \usepackage{float}
 \graphicspath{{obrazky/}}
@@ -51,12 +52,13 @@ pdfpagemode=FullScreen,
 \clearpage\maketitle
 \thispagestyle{empty}
 \end{titlepage}
+
 \tableofcontents
 
 \section{Zadání}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=14cm]{TI.pdf}
+    \includegraphics[width=13cm]{TI.pdf}
     \caption{Zadání}
     \label{obr1: Zadání}
 \end{figure}
@@ -79,7 +81,7 @@ $F\subseteq Q $ - množina koncových stavů \newline
 
 Konečný automat je teoretický výpočetní model používaný v informatice pro studium formálních jazyků. Jedná se o počítač s konečným počtem stavů.
 Automat postupně čte symboly, které přicházejí ze vstupu a následně pomocí nich přechází mezi jednotlivými stavy. Počet stavů je konečný. Tento jednoduchý počítač nemá žádnou paměť a jediné,
-co si pamatuje je aktuální stav. V praxi se používá pro pro vyhodnocování regulárních výrazů.
+co si pamatuje je aktuální stav. V praxi se používá pro vyhodnocování regulárních výrazů.
 
 \begin{figure}[h!]
     \centering
@@ -95,22 +97,23 @@ Automat, který budeme vytvářet by měl obsahovat
     \item 10 stavů (\hyperref[sec: stavy]{viz. stavy})
     \item 8 snímačů (\hyperref[sec: snimace]{viz. snímače})
     \item 6 řídících signálů (\hyperref[sec: signaly]{viz. signály})
-    \item 2 spuštěcí tlačíka a kontrolní žárovku (\hyperref[sec: operator]{viz. řízení operátora})
+    \item 2 spouštěcí tlačítka a kontrolní žárovku (\hyperref[sec: operator]{viz. řízení operátora})
 \end{itemize}
 
-Konečný automat budeme realizovat v programovacím jazyce java a pro grafické rozhraní použijeme standardní knihovny
-javy \texttt{java.swing a java.awt}. Uživatel bude ovládat aplikaci pomocí klávesnice. Při stisku tlačítka \texttt{A} by se měla spustit
-sanitaze tanku. Při dovršení maxima se spustí signál \texttt{LA011} a pomocí čerpadla \texttt{P} se nádrž vypustí
+Konečný automat budeme realizovat v programovacím jazyce \texttt{Java} a pro grafické rozhraní přichází v úvahu použití standardní knihovny
+javy \texttt{java.swing a java.awt} nebo open source knihovny \texttt{JavaFX}. Uživatel bude ovládat aplikaci pomocí klávesnice. Při stisku tlačítka \texttt{A} by se měla spustit
+sanitace tanku. Při dovršení maxima se spustí signál \texttt{LA011} a pomocí čerpadla \texttt{P} se nádrž vypustí
 zpět do zásobní nádrže. V druhém kroku se tank napustí vodou a proplachuje se do té doby dokud \texttt{pH} výtoku neklesne pod dolní mez.
 Obdobně by měl program fungovat i pro signál \texttt{B}. Pokud by uživatel chtěl zavolat sanitaci tanku, který není prázdný zobrazí se mu
-chybové hlášení a měla by se rozsvítit žlutá chybová kontrolka. Grafické naplňování tanků plánujeme naimplementovat
-pomocí časové, kdy budeme za krátky časový úsek zvětšovat či zmenšovat o pár pixelů obdelník, který budeme vykreslovat uvnitř tanku
-a tím se navodí iluze napouštění a vypouštění tanku. Teoreticky bychom si mohli předpřipravit obrázky formátu \texttt{.gif}, ale myslím
-si, že první řešení je mnohem elegantnější.
+chybové hlášení a měla by se rozsvítit žlutá chybová kontrolka. Grafické naplňování tanků je asi nejlepší naimplementovat
+pomocí \texttt{timeru}, kdy se bude za krátký časový úsek měnit obraz. První variantou, jak toto uskutečnit, je pomocí vektorové grafiky, tedy bude se zvětšovat či zmenšovat o pár pixelů obdélník, který se bude vykreslovat uvnitř tanku
+a tím se navodí iluze napouštění a vypouštění tanku, dále se budou měnit barevné kruhy které znázorňují spuštění/otevření zařízení. Druhou variantou je předpřipravit obrázky formátu \texttt{.gif}, které by se mohly měnit podle stavu modelu.
 
 \section{Automatový model}
 
 \subsection{Stavy}
+Automat obsahuje následujících 10 stavů:
+
 STAV 0 - Systém není v činnosti \newline 
 STAV 1 - Tank A se napouští lihem \newline 
 STAV 2 - Tanku A se přečerpává čerpadlem \newline 
@@ -124,6 +127,8 @@ STAV 9 - Tank B se proplachuje dokud není ph v normálu \newline
 STAV 10 - Tank B se vypouští 
 
 \subsection{Snímače}
+Model automatu obsahuje následující signály od snímačů:
+ 
 LA011 - Hladina dosahuje maxima tanku A \newline 
 LA010 - Hladina nedosahuje maxima tanku A \newline 
 LA021 - Hladina dosahuje minima tanku A \newline 
@@ -134,20 +139,24 @@ LA041 - Hladina nedosahuje minima tanku B \newline
 LA040 - Hladina dosahuje minima tanku B
 
 \subsection{Řídící signály}
-P0 - Čerpadlo vyplé \newline 
-P1 - Čerpadlo zaplé \newline 
+Model automatu obsahuje následující řídící signály:
+
+P0 - Čerpadlo vypnuto \newline 
+P1 - Čerpadlo zapnuto \newline 
 Vi0 - Ventil i zavřen \newline 
 Vi1 - Ventil i otevřen \newline 
 Q0 - Ph nad požadovanou mezí \newline 
 Q1 - Ph pod požadovanou mezí 
 
 \subsection{Řízení operátora}
+Panel operátora obsahuje následující položky:
+
 A - Sanitace tanku A \newline 
 B - Sanitace tanku B \newline 
 Z - Žárovka
 
 \subsection{Přechodový graf}
-Na naásledujícím obrázku je přechodový graf konečného automatu.
+Na následujícím obrázku je přechodový graf konečného automatu.
 \begin{figure}[h]
 \centering 
 \includegraphics[width=14cm]{prechodovyAutomat}
@@ -164,7 +173,7 @@ Na naásledujícím obrázku je přechodový graf konečného automatu.
 \end{itemize}
 
 \section{Implementace}
-Program je implementován v jezyce Java. Při vytváření programu bylo zvažováno, zda nebudou nakresleny obrázky v nějakém z grafických editorů, které se budou postupně měnit. Toto nám, ale přišlo krajně nepraktické, a proto byla zvolena implementace s pomocí knihovnou \texttt{Java Swing} a vektorovou grafikou, která se bude překreslovat podle aktuálního stavu. 
+Program je implementován v jazyce Java. Při vytváření programu bylo zvažováno, zda nebudou nakresleny obrázky v nějakém z grafických editorů, které se budou postupně měnit. Toto nám, ale přišlo krajně nepraktické, a proto byla zvolena implementace s pomocí knihovny \texttt{Java Swing} a vektorovou grafikou, která se bude překreslovat podle aktuálního stavu. 
 
 \vspace{0.25cm}
 Tato knihovna vytváří okno v metodě \texttt{main()}, které má pevně stanovenou velikost. O obsah okna se stará třída \texttt{DrawingPanel}, která je zodpovědná o vzhled modelu. Tato třída obsahuje i logiku automatu. Při spuštění se vše inicializuje tak, aby se vykreslil automat ve stavu 0, tedy v nečinnosti.
@@ -173,15 +182,15 @@ Tato knihovna vytváří okno v metodě \texttt{main()}, které má pevně stano
 Každá komponenta má svoji proměnnou, která uchovává její stav. Tento stav se poté promítá do výsledného grafického výstupu. Stavy komponent jsou reprezentovány barvami. Zelená znamená logickou 1 a červená logickou 0. Toto neplatí u žárovky, která je při logické 1 žlutá a při logické 0 šedá. Komponenta tanku je pak řešena tak, že uchovává data o její plnosti v procentech a druh jejího obsahu (voda, líh, vzduch), který je řešen pomocí enumu \texttt{Napln}.
 
 \vspace{0.25cm}
-Stavy modelu jsou realizovány pomocí proměnné \texttt{stav} datového typu \texttt{Integer}. V programu je zabudovaný \texttt{timer}, který každých \texttt{50ms} spustí metodu \newline \texttt{zjistiStav()}, která zjistí stav a následně podle toho spustí metodu příslušející aktuálnímu stavu modelu. Každý stav pak vykonává nějakou pro něj typickou činnost (plnění tanku, čerpání lihu z nádrže, atd.), dokud není splněna podmínka (např.: pro stav 1 snímač LA01 je v logické 1), pokud je potřebná podmínka splněna, model se přesouvá do dalšího stavu (uložení do proměnné \texttt{stav} příslušné hodnoty). metody stavů jsou nazvány \texttt{stav[A|B][1|2|3|4|5]}. Pro aktualizování stavu snímaču slouží metoda \texttt{aktualizujStav()}, která kontroluje, zda má smímač posílat logickou 1 nebo 0.
+Stavy modelu jsou realizovány pomocí proměnné \texttt{stav} datového typu \texttt{Integer}. V programu je zabudovaný \texttt{timer}, který každých \texttt{50ms} spustí metodu \newline \texttt{zjistiStav()}, která zjistí stav a následně podle toho spustí metodu příslušející aktuálnímu stavu modelu. Každý stav pak vykonává nějakou pro něj typickou činnost (plnění tanku, čerpání lihu z nádrže, atd.), dokud není splněna podmínka (např.: pro stav 1 snímač LA01 je v logické 1), pokud je potřebná podmínka splněna, model se přesouvá do dalšího stavu (uložení do proměnné \texttt{stav} příslušné hodnoty). metody stavů jsou nazvány \texttt{stav[A|B][1|2|3|4|5]}. Pro aktualizování stavu snímačů slouží metoda \texttt{aktualizujStav()}, která kontroluje, zda má snímač posílat logickou 1 nebo 0.
 
 \vspace{0.25cm}
-Reakce na uživatele je vyřešena pomocí metody \texttt{keyListener()}, rozeznávající, která klávesa byla stisknuta nebo uvolněna. Díky této metodě lze spoštět jednotlivé sanitarizace a manuálně ovládat model, avšak manuální ovládání je povoleno jen, když je konečný automat ve stavu 0. K zjištění, zda je ovládání povoleno slouží metoda \texttt{isManualniPovoleno()}. Jestliže chce uživatel spustit akci, která nemůže být spuštěna z důvodu chybového stavu, je zavolána metoda \texttt{vypisChybu()}, která vypíše ve vyskakovacím okně chybu a rozsvítí žárovku, která zhasne po zavření okna, které se zobrazilo.
+Reakce na uživatele je vyřešena pomocí metody \texttt{keyListener()}, rozeznávající, která klávesa byla stisknuta nebo uvolněna. Díky této metodě lze spouštět jednotlivé sanitace a manuálně ovládat model, avšak manuální ovládání je povoleno jen, když je konečný automat ve stavu 0. K zjištění, zda je ovládání povoleno slouží metoda \texttt{isManualniPovoleno()}. Jestliže chce uživatel spustit akci, která nemůže být spuštěna z důvodu chybového stavu, je zavolána metoda \texttt{vypisChybu()}, která vypíše ve vyskakovacím okně chybu a rozsvítí žárovku, která zhasne po zavření okna, které se zobrazilo.
 
 \section{Uživatelská příručka}
 
 \subsection{Spuštění programu}
-Aplikace se spoští pomocí příkazu v příkazové řádce. Před zadáním příkazu se musíme ujistit, zda se nacházíme ve stejné složce, jako jar soubor, který se chystáme spustit (\texttt{semestralkaTI.jar}). Aplikaci poté spustíme pomocí příkazu: \texttt{java -jar semestralkaTI.jar} \ref{spusteni}. Pro spuštění je předpokladem mít nainstalovanou Javu verze nejméně 11. Odkaz ke stažení Javy 11: %\url{ https://www.oracle.com/java/technologies/downloads/#java11}
+Aplikace se spouští pomocí příkazu v příkazové řádce. Před zadáním příkazu se musíme ujistit, zda se nacházíme ve stejné složce, jako jar soubor, který se chystáme spustit (\texttt{semestralkaTI.jar}). Aplikaci poté spustíme pomocí příkazu: \texttt{java -jar semestralkaTI.jar} \ref{spusteni}. Pro spuštění je předpokladem mít nainstalovanou Javu verze nejméně 11. Odkaz ke stažení Javy 11: \url{ https://www.oracle.com/java/technologies/downloads/#java11}
 
 \begin{figure}[h]
 \centering 
@@ -194,17 +203,55 @@ Pokud se program podaří spustit zobrazí se model sanitarizace tanků \ref{vzh
 
 \begin{figure}[h]
 \centering 
-\includegraphics[width=10cm]{pospusteni}
+\includegraphics[width=6cm]{pospusteni}
 \caption{Vzhled aplikace po spuštění}
 \label{vzhled}
 \end{figure}
 
+\begin{figure}[h]
+\centering 
+\includegraphics[width=6cm]{vprovozu}
+\caption{Vzhled aplikace při provozu}
+\end{figure}
+
 \subsection{Ovládání aplikace}
-Po spuštění se zobrazí model ve stavu 0. Červená barva znamená logicloku 0, tedy ventil je zavřené, tlačítko není stlačeno, ph není v požadované mezi, čerpadlo nečerpá líh, hladina v tanku není výš než snímač. Zelená barva znamená naopak logickou 1, tedy ventil je otevřený, tlačítko je stlačeno, atd. Žárovka má své barvy a to šedou pokud nesvítí a žlutou pokud svítí. Voda je znázorněna modrou barvou a líh barvou šedou.
+Po spuštění se zobrazí model ve stavu 0. Červená barva znamená logickou 0, tedy ventil je zavřený, tlačítko není stlačeno, ph není v požadované mezi, čerpadlo nečerpá líh, hladina v tanku není výš než snímač. Zelená barva znamená naopak logickou 1, tedy ventil je otevřený, tlačítko je stlačeno, atd. Žárovka má své barvy a to šedou pokud nesvítí a žlutou pokud svítí. Voda je znázorněna modrou barvou a líh barvou šedou.
 
-Aplikace se ovládá pomocí klávesnice. Uživatel má k dispozici ovládací panel (Spouštění sanitarizace nádrží) a manuální ovládání, které zahrnuje ovládání jednotlivých ventilů a čerpadla. Při implementaci byla snaha o intuitivní ovládání, tedy ventily se ovládájí pomící jejich čísla, ostatní prvky se ovládají pomocí písmenka, kterým je daný prvek pojmenovaný. Podrobný výčet ovládání je uveden níže \ref{ovladani}.
+\begin{figure}[h]
+\centering
+\begin{subfigure}{0.3\textwidth}
+    \includegraphics[width=\textwidth]{b}
+    \caption{Prázdný tank}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.3\textwidth}
+    \includegraphics[width=\textwidth]{c}
+    \caption{Tank plný lihu}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.3\textwidth}
+    \includegraphics[width=\textwidth]{a}
+    \caption{Tank plný vody}
+\end{subfigure}
+        
+\caption{Vzhledy tanků při různé náplni}
+\end{figure}
 
+Aplikace se ovládá pomocí klávesnice. Uživatel má k dispozici ovládací panel (Spouštění sanitarizace nádrží) a manuální ovládání, které zahrnuje ovládání jednotlivých ventilů a čerpadla. Při implementaci byla snaha o intuitivní ovládání, tedy ventily se ovládájí pomocí jejich čísla, ostatní prvky se ovládají pomocí písmenka, kterým je daný prvek pojmenovaný. Podrobný výčet ovládání je uveden níže \ref{ovladani}.
+
+\begin{figure}[h]
+\centering 
+\includegraphics[width=4cm]{ovladacipanel}
+\caption{Ovládací panel}
+\end{figure}
+\newpage
 Aplikace počítá s neobvyklým zacházením. Jsou tedy ošetřeny stavy, při kterých by mohlo dojít k chybě. Při chybovém stavu vyskočí na uživatele upozornění a v modelu se rozsvítí žárovka. Výčet chybových stavů lze najít zde: \ref{chyba}
+
+\begin{figure}[h]
+\centering 
+\includegraphics[width=8cm]{chyba}
+\caption{Ukázka chybového stavu}
+\end{figure}
 
 \subsubsection{Výčet ovládacích kláves} \label{ovladani}
 A - Spuštění sanitarizace tanku A \newline 
