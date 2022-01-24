@@ -80,30 +80,52 @@ B - Sanitace tanku B \newline
 Z - Žárovka
 
 \subsection{Přechodový graf}
-\begin{figure}
+Na naásledujícím obrázku je přechodový graf konečného automatu.
+\begin{figure}[h]
 \centering 
 \includegraphics[width=14cm]{prechodovyAutomat}
 \caption{Přechodový graf automatu}
 \end{figure}
 
 \subsection{Chybové stavy} \label{chyba}
+\begin{itemize}
+  \item Uživatel chce začít sanitarizaci tanku, který není prázdný
+  \item Uživatel chce začít sanitarizaci tanku v době, kdy se sanitarizuje jiný tank
+  \item Uživatel chce míchat líh s vodou
+  \item Uživatel chce vylévat líh do potrubí
+  \item Uživatel chce čerpat vodu do nádrže s lihem
+\end{itemize}
 
 \section{Implementace}
+Program je implementován v jezyce Java. Při vytváření programu bylo zvažováno, zda nebudou nakresleny obrázky v nějakém z grafických editorů, které se budou postupně měnit. Toto nám, ale přišlo krajně nepraktické, a proto byla zvolena implementace s pomocí knihovnou \texttt{Java Swing} a vektorovou grafikou, která se bude překreslovat podle aktuálního stavu. 
+
+\vspace{0.25cm}
+Tato knihovna vytváří okno v metodě \texttt{main()}, které má pevně stanovenou velikost. O obsah okna se stará třída \texttt{DrawingPanel}, která je zodpovědná o vzhled modelu. Tato třída obsahuje i logiku automatu. Při spuštění se vše inicializuje tak, aby se vykreslil automat ve stavu 0, tedy v nečinnosti.
+
+\vspace{0.25cm}
+Každá komponenta má svoji proměnnou, která uchovává její stav. Tento stav se poté promítá do výsledného grafického výstupu. Stavy komponent jsou reprezentovány barvami. Zelená znamená logickou 1 a červená logickou 0. Toto neplatí u žárovky, která je při logické 1 žlutá a při logické 0 šedá. Komponenta tanku je pak řešena tak, že uchovává data o její plnosti v procentech a druh jejího obsahu (voda, líh, vzduch), který je řešen pomocí enumu \texttt{Napln}.
+
+\vspace{0.25cm}
+Stavy modelu jsou realizovány pomocí proměnné \texttt{stav} datového typu \texttt{Integer}. V programu je zabudovaný \texttt{timer}, který každých \texttt{50ms} spustí matodu \texttt{zjistiStav()}, která zjistí stav a následně podle toho spustí metodu příslušející aktuálnímu stavu modelu. Každý stav pak vykonává nějakou pro něj typickou činnost (plnění tanku, čerpání lihu z nádrže, atd.), dokud není splněna podmínka (např.: pro stav 1 snímač LA01 je v logické 1), pokud je potřebná podmínka splněna, model se přesouvá do dalšího stavu (uložení do proměnné \texttt{stav} příslušné hodnoty). metody stavů jsou nazvány \texttt{stav[A|B][1|2|3|4|5]}. Pro aktualizování stavu snímaču slouží metoda \texttt{aktualizujStav()}, která kontroluje, zda má smímač posílat logickou 1 nebo 0.
+
+\vspace{0.25cm}
+Reakce na uživatele je vyřešena pomocí metody \texttt{keyListener()}, rozeznávající, která klávesa byla stisknuta nebo uvolněna. Díky této metodě lze spoštět jednotlivé sanitarizace a manuálně ovládat model, avšak manuální ovládání je povoleno jen, když je konečný automat ve stavu 0. K zjištění, zda je ovládání povoleno slouží metoda \texttt{isManualniPovoleno()}. Jestliže chce uživatel spustit akci, která nemůže být spuštěna z důvodu chybového stavu, je zavolána metoda \texttt{vypisChybu()}, která vypíše ve vyskakovacím okně chybu a rozsvítí žárovku, která zhasne po zavření okna, které se zobrazilo.
 
 \section{Uživatelská příručka}
 
 \subsection{Spuštění programu}
-Aplikace se spoští pomocí příkazu v příkazové řádce. Před zadáním příkazu se musíme ujistit, zda se nacházíme ve stejné složce, jako jar soubor, který se chystáme spustit (\texttt{semestralkaTI.jar}). Aplikaci poté spustíme pomocí příkazu: \texttt{java -jar semestralkaTI.jar}. Pro spuštění je předpokladem mít nainstalovanou Javu verze nejméně 11. Odkaz ke stažení Javy 11: \url{ https://www.oracle.com/java/technologies/downloads/#java11}
+Aplikace se spoští pomocí příkazu v příkazové řádce. Před zadáním příkazu se musíme ujistit, zda se nacházíme ve stejné složce, jako jar soubor, který se chystáme spustit (\texttt{semestralkaTI.jar}). Aplikaci poté spustíme pomocí příkazu: \texttt{java -jar semestralkaTI.jar} \ref{spusteni}. Pro spuštění je předpokladem mít nainstalovanou Javu verze nejméně 11. Odkaz ke stažení Javy 11: \url{ https://www.oracle.com/java/technologies/downloads/#java11}
 
 \begin{figure}[h]
 \centering 
 \includegraphics{prikladSpusteni}
 \caption{Příklad spuštění}
+\label{spusteni}
 \end{figure}
 
 Pokud se program podaří spustit zobrazí se model sanitarizace tanků \ref{vzhled}.
 
-\begin{figure}
+\begin{figure}[h]
 \centering 
 \includegraphics[width=10cm]{pospusteni}
 \caption{Vzhled aplikace po spuštění}
@@ -130,6 +152,6 @@ P - Manuální spuštění čerpadla \newline
 7 - Manuální otevření ventilu 7 \newline 
 
 \section{Závěr}
-Celkovou práci hodnotím pozitivně, neboť jsem si vyzkoušel napsat konečný automat. Byl to pro mne nepopsatelný zážitek, který mě studijně obohatil a posunul o krok blíže k praktickým aplikacím teoreticky získaných vědomostí. 
+Celkovou práci hodnotím pozitivně, neboť se nám povedlo zprovoznit model sanitarizace pivních tanků. V rámci úlohy jsme si vyzkoušeli napsat konečný automat. Byl to pro nás zážitek, který nás studijně obohatil a posunul o krok blíže k praktickým aplikacím teoreticky získaných vědomostí. 
 
 \end{document}
