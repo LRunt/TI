@@ -5,9 +5,26 @@
 \usepackage [czech]{babel}
 \usepackage{graphicx}
 \usepackage[numbib]{tocbibind}
-\usepackage{hyperref}
+%\usepackage{hyperref}
+\usepackage{float}
 \graphicspath{{obrazky/}}
 \newcommand{\Break}{\State \textbf{break} }
+
+\setlength{\parindent}{0pt}
+
+\usepackage{relsize}
+
+%reference
+\usepackage{hyperref}
+\usepackage{url}
+
+\hypersetup{
+colorlinks=true,
+linkcolor=black,
+urlcolor=blue,
+pdftitle={Overleaf Example},
+pdfpagemode=FullScreen,
+}
 
 \title{\includegraphics[width=10cm]{FAV_cmyk}
 
@@ -34,12 +51,62 @@
 \clearpage\maketitle
 \thispagestyle{empty}
 \end{titlepage}
-\tableofcontents \newpage
+\tableofcontents
 
 \section{Zadání}
-\includegraphics[width=14cm]{TI.pdf}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=14cm]{TI.pdf}
+    \caption{Zadání}
+    \label{obr1: Zadání}
+\end{figure}
+%\includegraphics[width=14cm]{TI.pdf}
 
 \section{Analýza úlohy}
+\subsection{Konečný automat}
+\subsubsection{Definice}
+
+\noindent Definice konečného automatu
+\[
+    \mathlarger{A = (Q, \Sigma, \delta , q_0, F)} 
+\]
+
+\noindent$Q$ - konečná neprázdná množina stavů \newline
+$\Sigma$ - konečná neprázdná množina vstupních symbolů \newline
+$\delta$ - $Q \times \Sigma \rightarrow $ přechodová funkce \newline
+$q_0 \in Q $ - počáteční stav \newline
+$F\subseteq Q $ - množina koncových stavů \newline
+
+Konečný automat je teoretický výpočetní model používaný v informatice pro studium formálních jazyků. Jedná se o počítač s konečným počtem stavů.
+Automat postupně čte symboly, které přicházejí ze vstupu a následně pomocí nich přechází mezi jednotlivými stavy. Počet stavů je konečný. Tento jednoduchý počítač nemá žádnou paměť a jediné,
+co si pamatuje je aktuální stav. V praxi se používá pro pro vyhodnocování regulárních výrazů.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=8cm]{konecny_automat.png}
+    \caption{Příklad konečného automatu se třemi stavy}
+    \label{konecny_automat: 1}
+\end{figure}
+
+\subsubsection{Analýza}
+
+Automat, který budeme vytvářet by měl obsahovat
+\begin{itemize}
+    \item 10 stavů (\hyperref[sec: stavy]{viz. stavy})
+    \item 8 snímačů (\hyperref[sec: snimace]{viz. snímače})
+    \item 6 řídících signálů (\hyperref[sec: signaly]{viz. signály})
+    \item 2 spuštěcí tlačíka a kontrolní žárovku (\hyperref[sec: operator]{viz. řízení operátora})
+\end{itemize}
+
+Konečný automat budeme realizovat v programovacím jazyce java a pro grafické rozhraní použijeme standardní knihovny
+javy \texttt{java.swing a java.awt}. Uživatel bude ovládat aplikaci pomocí klávesnice. Při stisku tlačítka \texttt{A} by se měla spustit
+sanitaze tanku. Při dovršení maxima se spustí signál \texttt{LA011} a pomocí čerpadla \texttt{P} se nádrž vypustí
+zpět do zásobní nádrže. V druhém kroku se tank napustí vodou a proplachuje se do té doby dokud \texttt{pH} výtoku neklesne pod dolní mez.
+Obdobně by měl program fungovat i pro signál \texttt{B}. Pokud by uživatel chtěl zavolat sanitaci tanku, který není prázdný zobrazí se mu
+chybové hlášení a měla by se rozsvítit žlutá chybová kontrolka. Grafické naplňování tanků plánujeme naimplementovat
+pomocí časové, kdy budeme za krátky časový úsek zvětšovat či zmenšovat o pár pixelů obdelník, který budeme vykreslovat uvnitř tanku
+a tím se navodí iluze napouštění a vypouštění tanku. Teoreticky bychom si mohli předpřipravit obrázky formátu \texttt{.gif}, ale myslím
+si, že první řešení je mnohem elegantnější.
 
 \section{Automatový model}
 
@@ -106,7 +173,7 @@ Tato knihovna vytváří okno v metodě \texttt{main()}, které má pevně stano
 Každá komponenta má svoji proměnnou, která uchovává její stav. Tento stav se poté promítá do výsledného grafického výstupu. Stavy komponent jsou reprezentovány barvami. Zelená znamená logickou 1 a červená logickou 0. Toto neplatí u žárovky, která je při logické 1 žlutá a při logické 0 šedá. Komponenta tanku je pak řešena tak, že uchovává data o její plnosti v procentech a druh jejího obsahu (voda, líh, vzduch), který je řešen pomocí enumu \texttt{Napln}.
 
 \vspace{0.25cm}
-Stavy modelu jsou realizovány pomocí proměnné \texttt{stav} datového typu \texttt{Integer}. V programu je zabudovaný \texttt{timer}, který každých \texttt{50ms} spustí matodu \texttt{zjistiStav()}, která zjistí stav a následně podle toho spustí metodu příslušející aktuálnímu stavu modelu. Každý stav pak vykonává nějakou pro něj typickou činnost (plnění tanku, čerpání lihu z nádrže, atd.), dokud není splněna podmínka (např.: pro stav 1 snímač LA01 je v logické 1), pokud je potřebná podmínka splněna, model se přesouvá do dalšího stavu (uložení do proměnné \texttt{stav} příslušné hodnoty). metody stavů jsou nazvány \texttt{stav[A|B][1|2|3|4|5]}. Pro aktualizování stavu snímaču slouží metoda \texttt{aktualizujStav()}, která kontroluje, zda má smímač posílat logickou 1 nebo 0.
+Stavy modelu jsou realizovány pomocí proměnné \texttt{stav} datového typu \texttt{Integer}. V programu je zabudovaný \texttt{timer}, který každých \texttt{50ms} spustí metodu \newline \texttt{zjistiStav()}, která zjistí stav a následně podle toho spustí metodu příslušející aktuálnímu stavu modelu. Každý stav pak vykonává nějakou pro něj typickou činnost (plnění tanku, čerpání lihu z nádrže, atd.), dokud není splněna podmínka (např.: pro stav 1 snímač LA01 je v logické 1), pokud je potřebná podmínka splněna, model se přesouvá do dalšího stavu (uložení do proměnné \texttt{stav} příslušné hodnoty). metody stavů jsou nazvány \texttt{stav[A|B][1|2|3|4|5]}. Pro aktualizování stavu snímaču slouží metoda \texttt{aktualizujStav()}, která kontroluje, zda má smímač posílat logickou 1 nebo 0.
 
 \vspace{0.25cm}
 Reakce na uživatele je vyřešena pomocí metody \texttt{keyListener()}, rozeznávající, která klávesa byla stisknuta nebo uvolněna. Díky této metodě lze spoštět jednotlivé sanitarizace a manuálně ovládat model, avšak manuální ovládání je povoleno jen, když je konečný automat ve stavu 0. K zjištění, zda je ovládání povoleno slouží metoda \texttt{isManualniPovoleno()}. Jestliže chce uživatel spustit akci, která nemůže být spuštěna z důvodu chybového stavu, je zavolána metoda \texttt{vypisChybu()}, která vypíše ve vyskakovacím okně chybu a rozsvítí žárovku, která zhasne po zavření okna, které se zobrazilo.
@@ -114,7 +181,7 @@ Reakce na uživatele je vyřešena pomocí metody \texttt{keyListener()}, rozezn
 \section{Uživatelská příručka}
 
 \subsection{Spuštění programu}
-Aplikace se spoští pomocí příkazu v příkazové řádce. Před zadáním příkazu se musíme ujistit, zda se nacházíme ve stejné složce, jako jar soubor, který se chystáme spustit (\texttt{semestralkaTI.jar}). Aplikaci poté spustíme pomocí příkazu: \texttt{java -jar semestralkaTI.jar} \ref{spusteni}. Pro spuštění je předpokladem mít nainstalovanou Javu verze nejméně 11. Odkaz ke stažení Javy 11: \url{ https://www.oracle.com/java/technologies/downloads/#java11}
+Aplikace se spoští pomocí příkazu v příkazové řádce. Před zadáním příkazu se musíme ujistit, zda se nacházíme ve stejné složce, jako jar soubor, který se chystáme spustit (\texttt{semestralkaTI.jar}). Aplikaci poté spustíme pomocí příkazu: \texttt{java -jar semestralkaTI.jar} \ref{spusteni}. Pro spuštění je předpokladem mít nainstalovanou Javu verze nejméně 11. Odkaz ke stažení Javy 11: %\url{ https://www.oracle.com/java/technologies/downloads/#java11}
 
 \begin{figure}[h]
 \centering 
@@ -152,6 +219,12 @@ P - Manuální spuštění čerpadla \newline
 7 - Manuální otevření ventilu 7 \newline 
 
 \section{Závěr}
-Celkovou práci hodnotím pozitivně, neboť se nám povedlo zprovoznit model sanitarizace pivních tanků. V rámci úlohy jsme si vyzkoušeli napsat konečný automat. Byl to pro nás zážitek, který nás studijně obohatil a posunul o krok blíže k praktickým aplikacím teoreticky získaných vědomostí. 
+Výsledkem semestrální práce je funkční program simulující konečněautomatový model řídícího systému sanitace pivovarských tanků. Na práci by šla udělat nějaká vylepšení, například umožnit uživateli měnit velikost okna, ovšem myslíme si, že výsledek naší práce vypadá celkem solidně. V rámci úlohy jsme si vyzkoušeli napsat konečný automat, což byl také cíl. Byl to pro nás zážitek, který nás studijně obohatil a posunul o krok blíže k praktickým aplikacím teoreticky získaných vědomostí. 
 
+\nocite{wiki:Konecny_automat}
+
+\listoffigures
+
+\bibliography{references}
+\bibliographystyle{ieeetran}
 \end{document}
