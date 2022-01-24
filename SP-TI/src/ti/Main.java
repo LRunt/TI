@@ -7,7 +7,7 @@ import javax.swing.JFrame;
 
 /**
  * Hlavni trida..
- * @author Lenovo
+ * @author Lukáš Runt, Miroslav Vdoviak
  * @version 1.1 (05-01-2022)
  */
 public class Main {

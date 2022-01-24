@@ -3,6 +3,8 @@ package ti;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 
@@ -10,7 +12,7 @@ import javax.swing.JOptionPane;
 
 /**
  * @author Lukas Runt, Miroslav Vdoviak
- * @version 1.1 (06-01-2022)
+ * @version 2.0 (22-01-2022)
  */
 @SuppressWarnings("serial")
 public class DrawingPanel extends Component {
@@ -248,6 +250,7 @@ public class DrawingPanel extends Component {
 			}
 		});
 	}
+	
 	
 	@Override
 	public void paint(Graphics g) {
@@ -574,8 +577,6 @@ public class DrawingPanel extends Component {
 		tank1 += RYCHLOST_PRUTOKU;
 		if(LA01 == LOG_JEDN) {
 			stav++;
-			V3 = LOG_NULA;
-			V2 = LOG_NULA;
 			phTanku = 100;
 		}
 	}
@@ -594,6 +595,8 @@ public class DrawingPanel extends Component {
 		repaint();
 		if(phTanku <= 0) {
 			stav++;
+			V3 = LOG_NULA;
+			V2 = LOG_NULA;
 			ph = LOG_JEDN;
 		}
 	}
@@ -656,8 +659,6 @@ public class DrawingPanel extends Component {
 		tank2 += RYCHLOST_PRUTOKU;
 		if(LA03 == LOG_JEDN) {
 			stav++;
-			V2 = LOG_NULA;
-			V4 = LOG_NULA;
 			phTanku = 100;
 		}
 	}
@@ -676,6 +677,8 @@ public class DrawingPanel extends Component {
 		repaint();
 		if(phTanku <= 0) {
 			stav++;
+			V2 = LOG_NULA;
+			V4 = LOG_NULA;
 			ph = LOG_JEDN;
 		}
 	}
@@ -825,9 +828,12 @@ public class DrawingPanel extends Component {
 	 */
 	private void vypisChybu(String nazevOkna, String chybovaHlaska) {
 		Frame frame = new Frame();
+		zarovka = ZAROVKA_SVITI;
 		JOptionPane.showMessageDialog(frame,
 			    chybovaHlaska,
 			    nazevOkna,
 			    JOptionPane.WARNING_MESSAGE);
+		zarovka = ZAROVKA_ZHASLA;
 	}
+	
 }
