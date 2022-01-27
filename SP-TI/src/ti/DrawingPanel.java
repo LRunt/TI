@@ -3,8 +3,6 @@ package ti;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 
@@ -25,6 +23,11 @@ public class DrawingPanel extends Component {
 	private final int VELIKOST_OP = 150;
 	private final int VELIKOST_KONTROLKY = 50;
 	private final int VELIKOST_TEXTU = 25;
+	private final int VELIKOST_STAVU = 50;
+	/** Barva, ktera znaci neaktivni stav v prechodovem grafu */
+	private final Color NEAKTIVNI_STAV = Color.WHITE;
+	/** Barva, ktera znaci aktivni stav v prechodovem grafu */
+	private final Color AKTIVNI_STAV = Color.GREEN;
 	/** Logicka jednicka - Zelena barva */
 	private final Color LOG_JEDN = Color.GREEN;
 	/** Logicka nula - Cervena barva */
@@ -48,6 +51,8 @@ public class DrawingPanel extends Component {
 	private FontMetrics font;
 	/** zda jsou filtrovany tanky */
 	private boolean beziAkce = false;
+	/** pole popisu stavu */
+	private String[] popis;
 	
 	private Color tlacitkoA;
 	private Color tlacitkoB;
@@ -65,6 +70,17 @@ public class DrawingPanel extends Component {
 	private Color LA04;
 	private Color cerpadlo;
 	private Color ph;
+	private Color stav0 = AKTIVNI_STAV;
+	private Color stav1 = NEAKTIVNI_STAV;
+	private Color stav2 = NEAKTIVNI_STAV;
+	private Color stav3 = NEAKTIVNI_STAV;
+	private Color stav4 = NEAKTIVNI_STAV;
+	private Color stav5 = NEAKTIVNI_STAV;
+	private Color stav6 = NEAKTIVNI_STAV;
+	private Color stav7 = NEAKTIVNI_STAV;
+	private Color stav8 = NEAKTIVNI_STAV;
+	private Color stav9 = NEAKTIVNI_STAV;
+	private Color stav10 = NEAKTIVNI_STAV;
 	
 	/** plnost tanku v % */
 	private int tank1 = 0;
@@ -75,13 +91,15 @@ public class DrawingPanel extends Component {
 	/** V jakem stavu procesu jsme 0 - nic se nedeje */
 	private int stav;
 	private int phTanku;
+	/** Rozhoduje zda bude automaticka simulace vypnuta nebo zapnuta*/
+	private boolean simulace = false;
 
 	/**
 	 * 
 	 */
 	public DrawingPanel() {
 		this.setFocusable(true);
-		this.setPreferredSize(new Dimension(600, 500));
+		this.setPreferredSize(new Dimension(1200, 500));
 		tlacitkoA = LOG_NULA;
 		tlacitkoB = LOG_NULA;
 		zarovka = ZAROVKA_ZHASLA;
@@ -95,6 +113,7 @@ public class DrawingPanel extends Component {
 		cerpadlo = LOG_NULA;
 		ph = LOG_JEDN;
 		stav = 0;
+		inicializacePopisuStavu();
 		
 		this.addKeyListener(new KeyListener() {
 			
@@ -169,6 +188,8 @@ public class DrawingPanel extends Component {
 						return;
 					}
 					stav = 1;
+					stav0 = NEAKTIVNI_STAV;
+					stav1 = AKTIVNI_STAV;
 					beziAkce = true;
 				}
 				if (e.getKeyChar() == 'B' || e.getKeyChar() == 'b') {
@@ -189,6 +210,8 @@ public class DrawingPanel extends Component {
 						return;
 					}
 					stav = 6;
+					stav0 = NEAKTIVNI_STAV;
+					stav6 = AKTIVNI_STAV;
 					beziAkce = true;
 				}
 				if (e.getKeyChar() == '1') {
@@ -331,6 +354,35 @@ public class DrawingPanel extends Component {
 		g2.drawOval(490, 410, 20, 20);
 		g2.drawString("Q - ph", 510 - font.stringWidth("Q - ph")/2, 400);
 		drawOvladaciPanel(g2, 400, 50, tlacitkoA, tlacitkoB);
+		//Stav
+		g2.drawString("Stav: " + stav, 600, 50);
+		g2.drawString("Popis: " + popis[stav], 600, 75);
+		//------------------------------------------------------------------
+		//Prechodovy graf
+		//------------------------------------------------------------------
+		drawArrow(720, 215, 650, 275, g2);
+		drawArrow(720, 330, 650, 275, g2);
+		drawArrow(805, 200, 765, 200, g2);
+		drawArrow(895, 200, 855, 200, g2);
+		drawArrow(985, 200, 945, 200, g2);
+		drawArrow(1080, 210, 1035, 200, g2);
+		drawArrow(805, 350, 765, 350, g2);
+		drawArrow(895, 350, 855, 350, g2);
+		drawArrow(985, 350, 945, 350, g2);
+		drawArrow(1080, 340, 1035, 350, g2);
+		drawArrow(670, 285, 1100, 320, g2);
+		drawArrow(670, 265, 1100, 230, g2);
+		drawStav(g2, 650, 275, stav0, "0");
+		drawStav(g2, 740, 200, stav1, "1");
+		drawStav(g2, 830, 200, stav2, "2");
+		drawStav(g2, 920, 200, stav3, "3");
+		drawStav(g2, 1010, 200, stav4, "4");
+		drawStav(g2, 1100, 220, stav5, "5");
+		drawStav(g2, 740, 350, stav6, "6");
+		drawStav(g2, 830, 350, stav7, "7");
+		drawStav(g2, 920, 350, stav8, "8");
+		drawStav(g2, 1010, 350, stav9, "9");
+		drawStav(g2, 1100, 330, stav10, "10");
 	}
 	
 	/**
@@ -463,6 +515,14 @@ public class DrawingPanel extends Component {
 		g2.drawString("Z", x + VELIKOST_OP/2 - font.stringWidth("Z")/2, y + VELIKOST_OP + VELIKOST_TEXTU / 2);
 	}
 	
+	private void drawStav(Graphics2D g2, int x, int y, Color barva, String text) {
+		g2.setColor(barva);
+		g2.fillOval(x - VELIKOST_STAVU/2, y - VELIKOST_STAVU/2, VELIKOST_STAVU, VELIKOST_STAVU);
+		g2.setColor(CARA);
+		g2.drawOval(x - VELIKOST_STAVU/2, y - VELIKOST_STAVU/2, VELIKOST_STAVU, VELIKOST_STAVU);
+		g2.drawString(text, x - font.stringWidth(text)/2, y + 7);
+	}
+	
 	/**
 	 * Metoda aktrualizuje stav v modelu (vetsinou kontrola snimacu) 
 	 */
@@ -548,6 +608,8 @@ public class DrawingPanel extends Component {
 			stav++;
 			V1 = LOG_NULA;
 			V3 = LOG_NULA;
+			stav1 = NEAKTIVNI_STAV;
+			stav2 = AKTIVNI_STAV;
 		}
 	}
 	
@@ -563,6 +625,8 @@ public class DrawingPanel extends Component {
 			stav++;
 			cerpadlo = LOG_NULA;
 			V5 = LOG_NULA;
+			stav2 = NEAKTIVNI_STAV;
+			stav3 = AKTIVNI_STAV;
 		}
 	}
 	
@@ -578,6 +642,8 @@ public class DrawingPanel extends Component {
 		if(LA01 == LOG_JEDN) {
 			stav++;
 			phTanku = 100;
+			stav3 = NEAKTIVNI_STAV;
+			stav4 = AKTIVNI_STAV;
 		}
 	}
 	
@@ -598,6 +664,8 @@ public class DrawingPanel extends Component {
 			V3 = LOG_NULA;
 			V2 = LOG_NULA;
 			ph = LOG_JEDN;
+			stav4 = NEAKTIVNI_STAV;
+			stav5 = AKTIVNI_STAV;
 		}
 	}
 	
@@ -614,6 +682,8 @@ public class DrawingPanel extends Component {
 			V5 = LOG_NULA;
 			V7 = LOG_NULA;
 			beziAkce = false;
+			stav5 = NEAKTIVNI_STAV;
+			stav0 = AKTIVNI_STAV;
 		}
 	}
 	
@@ -630,6 +700,8 @@ public class DrawingPanel extends Component {
 			stav++;
 			V1 = LOG_NULA;
 			V4 = LOG_NULA;
+			stav6 = NEAKTIVNI_STAV;
+			stav7 = AKTIVNI_STAV;
 		}
 	}
 	
@@ -645,6 +717,8 @@ public class DrawingPanel extends Component {
 			stav++;
 			cerpadlo = LOG_NULA;
 			V6 = LOG_NULA;
+			stav7 = NEAKTIVNI_STAV;
+			stav8 = AKTIVNI_STAV;
 		}
 	}
 	
@@ -660,6 +734,8 @@ public class DrawingPanel extends Component {
 		if(LA03 == LOG_JEDN) {
 			stav++;
 			phTanku = 100;
+			stav8 = NEAKTIVNI_STAV;
+			stav9 = AKTIVNI_STAV;
 		}
 	}
 	
@@ -680,6 +756,8 @@ public class DrawingPanel extends Component {
 			V2 = LOG_NULA;
 			V4 = LOG_NULA;
 			ph = LOG_JEDN;
+			stav9 = NEAKTIVNI_STAV;
+			stav10 = AKTIVNI_STAV;
 		}
 	}
 	
@@ -696,6 +774,8 @@ public class DrawingPanel extends Component {
 			V6 = LOG_NULA;
 			V7 = LOG_NULA;
 			beziAkce = false;
+			stav10 = NEAKTIVNI_STAV;
+			stav0 = AKTIVNI_STAV;
 		}
 	}
 	
@@ -834,6 +914,25 @@ public class DrawingPanel extends Component {
 			    nazevOkna,
 			    JOptionPane.WARNING_MESSAGE);
 		zarovka = ZAROVKA_ZHASLA;
+	}
+	
+	/**
+	 * Metoda inicializuje pole popisu jednotlivych stavu
+	 */
+	private void inicializacePopisuStavu() {
+		popis = new String[11];
+		popis[0] = "System je v necinnosti";
+		popis[1] = "Tank A se napousti lihem";
+		popis[2] = "Tanku A se precerpava cerpadlem";
+		popis[3] = "Tank A se plni vodou";
+		popis[4] = "Tank A se proplachuje dokud neni ph v normalu";
+		popis[5] = "Tank A se vypousti";
+		popis[6] = "Tank B se napousti lihem";
+		popis[7] = "Tanku B se precerpava cerpadlem";
+		popis[8] = "Tank B se plni vodou";
+		popis[9] = "Tank B se proplachuje dokud neni ph v normalu";
+		popis[10] = "Tank B se vypousti";
+		
 	}
 	
 }
