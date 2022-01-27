@@ -92,7 +92,8 @@ public class DrawingPanel extends Component {
 	private int stav;
 	private int phTanku;
 	/** Rozhoduje zda bude automaticka simulace vypnuta nebo zapnuta*/
-	private boolean simulace = false;
+	public boolean simulace = false;
+	private String vstup = "";
 
 	/**
 	 * 
@@ -111,8 +112,12 @@ public class DrawingPanel extends Component {
 		V6 = LOG_NULA;
 		V7 = LOG_NULA;
 		cerpadlo = LOG_NULA;
-		ph = LOG_JEDN;
+		ph = LOG_NULA;
 		stav = 0;
+		LA01 = LOG_NULA;
+		LA02 = LOG_NULA;
+		LA03 = LOG_NULA;
+		LA04 = LOG_NULA;
 		inicializacePopisuStavu();
 		
 		this.addKeyListener(new KeyListener() {
@@ -164,6 +169,26 @@ public class DrawingPanel extends Component {
 				}
 				if (e.getKeyChar() == 'P' || e.getKeyChar() == 'p') {
 					cerpadlo = LOG_NULA;
+					repaint();
+				}
+				if (e.getKeyChar() == 'Q' || e.getKeyChar() == 'q') {
+					ph = LOG_NULA;
+					repaint();
+				}
+				if (e.getKeyChar() == 'I' || e.getKeyChar() == 'i') {
+					LA01 = LOG_NULA;
+					repaint();
+				}
+				if (e.getKeyChar() == 'J' || e.getKeyChar() == 'j') {
+					LA02 = LOG_NULA;
+					repaint();
+				}
+				if (e.getKeyChar() == 'O' || e.getKeyChar() == 'o') {
+					LA03 = LOG_NULA;
+					repaint();
+				}
+				if (e.getKeyChar() == 'K' || e.getKeyChar() == 'k') {
+					LA04 = LOG_NULA;
 					repaint();
 				}
 			}
@@ -270,6 +295,45 @@ public class DrawingPanel extends Component {
 						repaint();
 					}
 				}
+				if (e.getKeyChar() == 'S' || e.getKeyChar() == 's') {
+					simulace = !simulace;
+					repaint();
+					if(simulace) {
+						ph = LOG_JEDN;
+					}else {
+						ph = LOG_NULA;
+					}
+				}
+				if (e.getKeyChar() == 'Q' || e.getKeyChar() == 'q') {
+					ph = LOG_JEDN;
+					vstup = "Q";
+					zjistiStavManual();
+					repaint();
+				}
+				if (e.getKeyChar() == 'I' || e.getKeyChar() == 'i') {
+					LA01 = LOG_JEDN;
+					vstup = "I";
+					zjistiStavManual();
+					repaint();
+				}
+				if (e.getKeyChar() == 'J' || e.getKeyChar() == 'j') {
+					LA02 = LOG_JEDN;
+					vstup = "J";
+					zjistiStavManual();
+					repaint();
+				}
+				if (e.getKeyChar() == 'O' || e.getKeyChar() == 'o') {
+					LA03 = LOG_JEDN;
+					vstup = "O";
+					zjistiStavManual();
+					repaint();
+				}
+				if (e.getKeyChar() == 'K' || e.getKeyChar() == 'k') {
+					LA04 = LOG_JEDN;
+					vstup = "K";
+					zjistiStavManual();
+					repaint();
+				}
 			}
 		});
 	}
@@ -289,7 +353,9 @@ public class DrawingPanel extends Component {
 	 * @param g2 grafika
 	 */
 	private void drawModel(Graphics2D g2) {
-		aktualizujStav();
+		if(simulace) {
+			aktualizujStav();
+		}
 		g2.setFont(new Font("Calibri", Font.BOLD, VELIKOST_TEXTU));
 		font = g2.getFontMetrics();
 		g2.setColor(Color.WHITE);
@@ -357,32 +423,60 @@ public class DrawingPanel extends Component {
 		//Stav
 		g2.drawString("Stav: " + stav, 600, 50);
 		g2.drawString("Popis: " + popis[stav], 600, 75);
+		if(simulace) {
+			g2.drawString("Automaticka simulace: ZAPNUTO", 600, 100);
+		}else {
+			g2.drawString("Automaticka simulace: VYPNUTO", 600, 100);
+		}
 		//------------------------------------------------------------------
 		//Prechodovy graf
 		//------------------------------------------------------------------
-		drawArrow(720, 215, 650, 275, g2);
-		drawArrow(720, 330, 650, 275, g2);
+		drawArrow(720, 215, 650, 300, g2);
+		drawArrow(720, 380, 650, 300, g2);
 		drawArrow(805, 200, 765, 200, g2);
 		drawArrow(895, 200, 855, 200, g2);
 		drawArrow(985, 200, 945, 200, g2);
 		drawArrow(1080, 210, 1035, 200, g2);
-		drawArrow(805, 350, 765, 350, g2);
-		drawArrow(895, 350, 855, 350, g2);
-		drawArrow(985, 350, 945, 350, g2);
-		drawArrow(1080, 340, 1035, 350, g2);
-		drawArrow(670, 285, 1100, 320, g2);
-		drawArrow(670, 265, 1100, 230, g2);
-		drawStav(g2, 650, 275, stav0, "0");
+		drawArrow(805, 400, 765, 400, g2);
+		drawArrow(895, 400, 855, 400, g2);
+		drawArrow(985, 400, 945, 400, g2);
+		drawArrow(1080, 390, 1035, 400, g2);
+		drawArrow(670, 310, 1100, 370, g2);
+		drawArrow(670, 290, 1100, 230, g2);
+		drawStav(g2, 650, 300, stav0, "0");
 		drawStav(g2, 740, 200, stav1, "1");
 		drawStav(g2, 830, 200, stav2, "2");
 		drawStav(g2, 920, 200, stav3, "3");
 		drawStav(g2, 1010, 200, stav4, "4");
 		drawStav(g2, 1100, 220, stav5, "5");
-		drawStav(g2, 740, 350, stav6, "6");
-		drawStav(g2, 830, 350, stav7, "7");
-		drawStav(g2, 920, 350, stav8, "8");
-		drawStav(g2, 1010, 350, stav9, "9");
-		drawStav(g2, 1100, 330, stav10, "10");
+		drawStav(g2, 740, 400, stav6, "6");
+		drawStav(g2, 830, 400, stav7, "7");
+		drawStav(g2, 920, 400, stav8, "8");
+		drawStav(g2, 1010, 400, stav9, "9");
+		drawStav(g2, 1100, 380, stav10, "10");
+		//popisky
+		//horni vetev
+		g2.drawString("A", 675, 240);
+		g2.drawString("LA01", 760, 160);
+		g2.drawString("(I)", 770, 180);
+		g2.drawString("LA02", 850, 160);
+		g2.drawString("(J)", 860, 180);
+		g2.drawString("LA01", 940, 160);
+		g2.drawString("(I)", 950, 180);
+		g2.drawString("Q", 1040, 190);
+		g2.drawString("LA02", 1020, 260);
+		g2.drawString("(J)", 1030, 280);
+		//spodni vetev
+		g2.drawString("B", 675, 365);
+		g2.drawString("LA03", 760, 455);
+		g2.drawString("(O)", 770, 430);
+		g2.drawString("LA04", 850, 455);
+		g2.drawString("(K)", 860, 430);
+		g2.drawString("LA03", 940, 455);
+		g2.drawString("(O)", 950, 430);
+		g2.drawString("Q", 1040, 420);
+		g2.drawString("LA04", 1020, 330);
+		g2.drawString("(K)", 1030, 350);
 	}
 	
 	/**
@@ -932,7 +1026,227 @@ public class DrawingPanel extends Component {
 		popis[8] = "Tank B se plni vodou";
 		popis[9] = "Tank B se proplachuje dokud neni ph v normalu";
 		popis[10] = "Tank B se vypousti";
-		
 	}
 	
+	/**
+	 * Konecny automat, podle stavu se spusti dalsi metoda
+	 */
+	public void zjistiStavManual(){
+		switch(stav) {
+		  case 1:
+		    stav1();
+		    break;
+		  case 2:
+		    stav2();
+		    break;
+		  case 3:
+			stav3();
+			break;
+		  case 4:
+			stav4();
+			break;
+		  case 5:
+			stav5();
+			break;
+		  case 6:
+			stav6();
+			break;
+		  case 7:
+			stav7();
+			break;
+		  case 8:
+		    stav8();
+			break;
+		  case 9:
+		    stav9();
+			break;
+		  case 10:
+			stav10();
+			break;
+		  default:
+			 break;
+			}
+		}
+		
+		/**
+		 * Stav, ve kterem se plni tank1 lihem
+		 */
+		private void stav1() {
+			NTank1 = Napln.LIH;
+			V1 = LOG_JEDN;
+			V3 = LOG_JEDN;
+			repaint();
+			if(vstup.equals("I")) {
+				stav++;
+				V1 = LOG_NULA;
+				V3 = LOG_NULA;
+				cerpadlo = LOG_JEDN;
+				V5 = LOG_JEDN;
+				tank1 = 100;
+				stav1 = NEAKTIVNI_STAV;
+				stav2 = AKTIVNI_STAV;
+			}
+		}
+		
+		/**
+		 * Stav, ve kterem se z tanku1 cerpa lih dokud neni zcela vycerpan
+		 */
+		private void stav2() {
+			repaint();
+			if(vstup.equals("J")) {
+				stav++;
+				cerpadlo = LOG_NULA;
+				V5 = LOG_NULA;
+				tank1 = 0;
+				V3 = LOG_JEDN;
+				V2 = LOG_JEDN;
+				stav2 = NEAKTIVNI_STAV;
+				stav3 = AKTIVNI_STAV;
+			}
+		}
+		
+		/**
+		 * Stav, ve kterem se tank1 plni vodou
+		 */
+		private void stav3() {
+			NTank1 = Napln.VODA;
+			repaint();
+			tank1 += RYCHLOST_PRUTOKU;
+			if(vstup.equals("I")) {
+				stav++;
+				tank1 = 100;
+				V5 = LOG_JEDN;
+				V7 = LOG_JEDN;
+				stav3 = NEAKTIVNI_STAV;
+				stav4 = AKTIVNI_STAV;
+			}
+		}
+		
+		/**
+		 * Stav, ve kterem se proplachuje tank1 vodou dokud neni ph v norme 
+		 */
+		private void stav4() {
+			repaint();
+			if(vstup.equals("Q")) {
+				stav++;
+				V3 = LOG_NULA;
+				V2 = LOG_NULA;
+				ph = LOG_JEDN;
+				tank1 = 25;
+				stav4 = NEAKTIVNI_STAV;
+				stav5 = AKTIVNI_STAV;
+			}
+		}
+		
+		/**
+		 * Vypousteni zbytku vody z tanku1
+		 */
+		private void stav5() {
+			ph = LOG_JEDN;
+			V5 = LOG_JEDN;
+			V7 = LOG_JEDN;
+			repaint();
+			if(vstup.equals("J")) {
+				stav = 0;
+				tank1 = 0;
+				V5 = LOG_NULA;
+				V7 = LOG_NULA;
+				ph = LOG_NULA;
+				beziAkce = false;
+				stav5 = NEAKTIVNI_STAV;
+				stav0 = AKTIVNI_STAV;
+			}
+		}
+		
+		/**
+		 * Stav, ve kterem se plni tank2 lihem
+		 */
+		private void stav6() {
+			V1 = LOG_JEDN;
+			V4 = LOG_JEDN;
+			NTank2 = Napln.LIH;
+			tank2 += RYCHLOST_PRUTOKU;
+			repaint();
+			if(LA03 == LOG_JEDN) {
+				stav++;
+				V1 = LOG_NULA;
+				V4 = LOG_NULA;
+				stav6 = NEAKTIVNI_STAV;
+				stav7 = AKTIVNI_STAV;
+			}
+		}
+		
+		/**
+		 * Stav, ve kterem se z tanku2 cerpa lih dokud neni zcela vycerpan
+		 */
+		private void stav7() {
+			cerpadlo = LOG_JEDN;
+			V6 = LOG_JEDN;
+			tank2 -= RYCHLOST_PRUTOKU;
+			repaint();
+			if(LA04 == LOG_NULA) {
+				stav++;
+				cerpadlo = LOG_NULA;
+				V6 = LOG_NULA;
+				stav7 = NEAKTIVNI_STAV;
+				stav8 = AKTIVNI_STAV;
+			}
+		}
+		
+		/**
+		 * Stav, ve kterem se tank2 plni vodou
+		 */
+		private void stav8() {
+			NTank2 = Napln.VODA;
+			V2 = LOG_JEDN;
+			V4 = LOG_JEDN;
+			repaint();
+			tank2 += RYCHLOST_PRUTOKU;
+			if(LA03 == LOG_JEDN) {
+				stav++;
+				phTanku = 100;
+				stav8 = NEAKTIVNI_STAV;
+				stav9 = AKTIVNI_STAV;
+			}
+		}
+		
+		/**
+		 * Stav, ve kterem se proplachuje tank2 vodou dokud neni ph v norme 
+		 */
+		private void stav9() {
+			V6 = LOG_JEDN;
+			V7 = LOG_JEDN;
+			ph = LOG_NULA;
+			phTanku -= 1;
+			if(tank2 >= 25) {
+				tank2 -= RYCHLOST_PRUTOKU/2;
+			}
+			repaint();
+			if(phTanku <= 0) {
+				stav++;
+				V2 = LOG_NULA;
+				V4 = LOG_NULA;
+				ph = LOG_JEDN;
+				stav9 = NEAKTIVNI_STAV;
+				stav10 = AKTIVNI_STAV;
+			}
+		}
+		
+		/**
+		 * Vypousteni zbytku vody z tanku2
+		 */
+		private void stav10() {
+			V6 = LOG_JEDN;
+			V7 = LOG_JEDN;
+			tank2 -= RYCHLOST_PRUTOKU;
+			repaint();
+			if(LA04 == LOG_NULA) {
+				stav = 0;
+				V6 = LOG_NULA;
+				V7 = LOG_NULA;
+				beziAkce = false;
+				stav10 = NEAKTIVNI_STAV;
+				stav0 = AKTIVNI_STAV;
+			}
+		}
 }

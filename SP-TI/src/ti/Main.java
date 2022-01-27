@@ -36,8 +36,9 @@ public class Main {
 				tm.schedule(new TimerTask() {
 					@Override
 					public void run() {
-						panel.zjistiStav();
-						//panel.repaint();
+						if(panel.simulace) {
+							panel.zjistiStav();
+						}
 					}
 				}, 0, 50);
 	}
