@@ -7,6 +7,6 @@ package ti;
  */
 public enum Napln {
 	NIC,
-	LIH,
+	LOUH,
 	VODA;
 }

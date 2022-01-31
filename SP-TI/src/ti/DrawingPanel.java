@@ -4,7 +4,9 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.util.Random;
 
 import javax.swing.JOptionPane;
 
@@ -24,6 +26,7 @@ public class DrawingPanel extends Component {
 	private final int VELIKOST_KONTROLKY = 50;
 	private final int VELIKOST_TEXTU = 25;
 	private final int VELIKOST_STAVU = 50;
+	Random r = new Random();
 	/** Barva, ktera znaci neaktivni stav v prechodovem grafu */
 	private final Color NEAKTIVNI_STAV = Color.WHITE;
 	/** Barva, ktera znaci aktivni stav v prechodovem grafu */
@@ -32,8 +35,8 @@ public class DrawingPanel extends Component {
 	private final Color LOG_JEDN = Color.GREEN;
 	/** Logicka nula - Cervena barva */
 	private final Color LOG_NULA = Color.RED;
-	/** Barva lihu - seda */
-	private final Color LIH = Color.GRAY;
+	/** Barva louhuu - seda */
+	private final Color LOUH = Color.GRAY;
 	/** Barva vody - modra */
 	private final Color VODA = Color.BLUE;
 	/** Barva car - cerna */
@@ -54,6 +57,7 @@ public class DrawingPanel extends Component {
 	/** pole popisu stavu */
 	private String[] popis;
 	private String vystup = "";
+	private String vstupText = "";
 	
 	private Color tlacitkoA;
 	private Color tlacitkoB;
@@ -91,7 +95,7 @@ public class DrawingPanel extends Component {
 	private Napln NTank2 = Napln.NIC;
 	/** V jakem stavu procesu jsme 0 - nic se nedeje */
 	private int stav;
-	private int phTanku;
+	private double phTanku;
 	/** Rozhoduje zda bude automaticka simulace vypnuta nebo zapnuta*/
 	public boolean simulace = false;
 	private String vstup = "";
@@ -101,7 +105,7 @@ public class DrawingPanel extends Component {
 	 */
 	public DrawingPanel() {
 		this.setFocusable(true);
-		this.setPreferredSize(new Dimension(1200, 500));
+		this.setPreferredSize(new Dimension(1400, 525));
 		tlacitkoA = LOG_NULA;
 		tlacitkoB = LOG_NULA;
 		zarovka = ZAROVKA_ZHASLA;
@@ -217,7 +221,8 @@ public class DrawingPanel extends Component {
 					stav0 = NEAKTIVNI_STAV;
 					stav1 = AKTIVNI_STAV;
 					beziAkce = true;
-					vystup = "V11 + V31";
+					vystup = "Oteviram ventil V1 a V3";
+					vstupText = "Stlaceno tlacitko A";
 				}
 				if (e.getKeyChar() == 'B' || e.getKeyChar() == 'b') {
 					tlacitkoB = LOG_JEDN;
@@ -240,7 +245,8 @@ public class DrawingPanel extends Component {
 					stav0 = NEAKTIVNI_STAV;
 					stav6 = AKTIVNI_STAV;
 					beziAkce = true;
-					vystup = "V11 + V41";
+					vystup = "Oteviram ventil V1 a V4";
+					vstupText = "Stlaceno tlacitko B";
 				}
 				if (e.getKeyChar() == '1') {
 					if(isOvladaniPovoleno()) {
@@ -369,7 +375,7 @@ public class DrawingPanel extends Component {
 		g2.drawString("Louh", 200 - font.stringWidth("Louh") / 2, 40);
 		drawArrow(200, 80, 200, 50, g2);
 		//g2.drawRect(175, 80, 50, 50);
-		g2.setColor(LIH);
+		g2.setColor(LOUH);
 		g2.fillRect(175, 80, 50, 50);
 		g2.setColor(CARA);
 		g2.drawLine(175, 80, 175, 130);
@@ -425,62 +431,76 @@ public class DrawingPanel extends Component {
 		drawOvladaciPanel(g2, 400, 50, tlacitkoA, tlacitkoB);
 		//Stav
 		g2.drawString("Stav: " + stav, 600, 50);
-		g2.drawString("Popis: " + popis[stav], 600, 75);
+		g2.drawString("Popis: " + popis[stav], 600, 125);
 		if(simulace) {
-			g2.drawString("Automaticka simulace: ZAPNUTO", 600, 125);
+			g2.drawString("Automaticka simulace: ZAPNUTO", 600, 150);
 		}else {
-			g2.drawString("Automaticka simulace: VYPNUTO", 600, 125);
+			g2.drawString("Automaticka simulace: VYPNUTO", 600, 150);
 		}
+		g2.drawString("Vstup: " + vstupText, 600, 75);
 		g2.drawString("Vystup: " + vystup, 600, 100);
+		AffineTransform oldTr1 = g2.getTransform();
+		g2.translate(0, 30);
 		//------------------------------------------------------------------
 		//Prechodovy graf
 		//------------------------------------------------------------------
-		drawArrow(720, 215, 650, 300, g2);
-		drawArrow(720, 380, 650, 300, g2);
-		drawArrow(805, 200, 765, 200, g2);
-		drawArrow(895, 200, 855, 200, g2);
-		drawArrow(985, 200, 945, 200, g2);
-		drawArrow(1080, 210, 1035, 200, g2);
-		drawArrow(805, 400, 765, 400, g2);
-		drawArrow(895, 400, 855, 400, g2);
-		drawArrow(985, 400, 945, 400, g2);
-		drawArrow(1080, 390, 1035, 400, g2);
-		drawArrow(670, 310, 1100, 370, g2);
-		drawArrow(670, 290, 1100, 230, g2);
+		drawArrow(720, 215, 650, 300, g2); //A
+		drawArrow(720, 380, 650, 300, g2); //B
+		drawArrow(830, 200, 765, 200, g2);
+		drawArrow(945, 200, 880, 200, g2);
+		//drawArrow(985, 200, 945, 200, g2);
+		drawCurvedArrow(988, 180, 1027, 160, 1067, 180, g2);
+		drawCurvedArrow(1067, 220, 1027, 250, 988, 220, g2);
+		drawArrow(1180, 210, 1110, 200, g2);
+		drawArrow(830, 400, 765, 400, g2);
+		drawArrow(945, 400, 880, 400, g2);
+		//drawArrow(985, 400, 945, 400, g2); //3->4
+		drawCurvedArrow(1067, 380, 1027, 360, 988, 380, g2);
+		drawCurvedArrow(988, 420, 1027, 450, 1067, 420, g2);
+		drawArrow(1180, 390, 1110, 400, g2); //Q
+		//drawArrow(670, 310, 1100, 370, g2);
+		drawCurvedArrow(1200, 370, 1300, 300, 670, 310, g2);
+		//drawArrow(670, 290, 1100, 230, g2);
+		drawCurvedArrow(1200, 230, 1400, 300, 670, 290, g2);
 		drawStav(g2, 650, 300, stav0, "0");
 		drawStav(g2, 740, 200, stav1, "1");
-		drawStav(g2, 830, 200, stav2, "2");
-		drawStav(g2, 920, 200, stav3, "3");
-		drawStav(g2, 1010, 200, stav4, "4");
-		drawStav(g2, 1100, 220, stav5, "5");
+		drawStav(g2, 855, 200, stav2, "2");
+		drawStav(g2, 970, 200, stav3, "3");
+		drawStav(g2, 1085, 200, stav4, "4");
+		drawStav(g2, 1200, 220, stav5, "5");
 		drawStav(g2, 740, 400, stav6, "6");
-		drawStav(g2, 830, 400, stav7, "7");
-		drawStav(g2, 920, 400, stav8, "8");
-		drawStav(g2, 1010, 400, stav9, "9");
-		drawStav(g2, 1100, 380, stav10, "10");
+		drawStav(g2, 855, 400, stav7, "7");
+		drawStav(g2, 970, 400, stav8, "8");
+		drawStav(g2, 1085, 400, stav9, "9");
+		drawStav(g2, 1200, 380, stav10, "10");
 		//popisky
 		//horni vetev
 		g2.drawString("A", 675, 240);
-		g2.drawString("LA01", 760, 160);
-		g2.drawString("(I)", 770, 180);
-		g2.drawString("LA02", 850, 160);
-		g2.drawString("(J)", 860, 180);
-		g2.drawString("LA01", 940, 160);
-		g2.drawString("(I)", 950, 180);
-		g2.drawString("Q", 1040, 190);
-		g2.drawString("LA02", 1020, 260);
-		g2.drawString("(J)", 1030, 280);
+		g2.drawString("LA01", 772, 160);
+		g2.drawString("(I)", 782, 180);
+		g2.drawString("LA02", 880, 160);
+		g2.drawString("(J)", 890, 180);
+		g2.drawString("LA01", 1005, 140);
+		g2.drawString("(I)", 1015, 160);
+		g2.drawString("LA02", 1005, 255);
+		g2.drawString("(J)", 1015, 275);
+		g2.drawString("Q", 1130, 190);
+		g2.drawString("LA02", 750, 260);
+		g2.drawString("(J)", 760, 280);
 		//spodni vetev
 		g2.drawString("B", 675, 365);
-		g2.drawString("LA03", 760, 455);
-		g2.drawString("(O)", 770, 430);
-		g2.drawString("LA04", 850, 455);
-		g2.drawString("(K)", 860, 430);
-		g2.drawString("LA03", 940, 455);
-		g2.drawString("(O)", 950, 430);
-		g2.drawString("Q", 1040, 420);
-		g2.drawString("LA04", 1020, 330);
-		g2.drawString("(K)", 1030, 350);
+		g2.drawString("LA03", 772, 455);
+		g2.drawString("(O)", 782, 430);
+		g2.drawString("LA04", 880, 455);
+		g2.drawString("(K)", 890, 430);
+		g2.drawString("LA04", 1005, 340);
+		g2.drawString("(K)", 1015, 360);
+		g2.drawString("LA03", 1005, 460);
+		g2.drawString("(O)", 1015, 480);
+		g2.drawString("Q", 1130, 420);
+		g2.drawString("LA04", 750, 330);
+		g2.drawString("(K)", 760, 350);
+		g2.setTransform(oldTr1);
 	}
 	
 	/**
@@ -524,6 +544,41 @@ public class DrawingPanel extends Component {
 		g2.draw(new Line2D.Double(c_x - v_x, c_y - v_y, x1, y1));
 	}
 	
+	private void drawCurvedArrow(double x1, double y1, double x2, double y2, double x3, double y3, Graphics2D g2) {
+		g2.setColor(CARA);
+		g2.setStroke(new BasicStroke(SIRKA_CARY, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
+		
+		//vypocet U
+		double u_x = x1 - this.getWidth()/2;
+		double u_y = y1 - this.getHeight()/2;
+		double u_len1 = 1 / Math.sqrt(u_x * u_x + u_y * u_y);
+		//jednotkove U
+		u_x *= u_len1;
+		u_y *= u_len1;
+		GeneralPath a = new GeneralPath();
+	    a.moveTo(x1, y1);
+	    a.curveTo(x1, y1, x2, y2, x3, y3);
+	    g2.draw(a);
+		//--------------hrot--------------------------------------------------
+		//hrot
+		double u_x2 = x3 - x2;
+		double u_y2 = (y3 - y2) / 1.5;
+		//jednotkove U
+		double u_len2 = 1 / Math.sqrt(u_x2 * u_x2 + u_y2 * u_y2);
+		u_x2 *= u_len2;
+		u_y2 *= u_len2;
+		//smer kolmy (jednotkova delka)
+		double v_x = u_y2;
+		double v_y = -u_x2;
+		//smer kolmy - delka o 1/2 sirky hrotu
+		v_x *= 0.35 * DELKA_HROTU;
+		v_y *= 0.35 * DELKA_HROTU;
+		double c_x = x3 - u_x2 * DELKA_HROTU;
+		double c_y = y3 - u_y2 * DELKA_HROTU;
+		g2.draw(new Line2D.Double(c_x + v_x, c_y + v_y, x3, y3));
+		g2.draw(new Line2D.Double(c_x - v_x, c_y - v_y, x3, y3));
+	}
+	
 	/**
 	 * Metoda kresli ventil
 	 * @param g2 Grafika
@@ -556,14 +611,14 @@ public class DrawingPanel extends Component {
 	 * @param color1 barva horniho senzoru, ktery znaci stav
 	 * @param color2 barva spodniho senzoru, ktery znaci stav
 	 * @param vyskaNaplne jak je tank naplnen
-	 * @param napln co je v tanku (LIH, VODA, NIC), podle tohoto se urcuje barva kterou je napln obarvena
+	 * @param napln co je v tanku (LOUH, VODA, NIC), podle tohoto se urcuje barva kterou je napln obarvena
 	 * @param sensorH horni senzor
 	 * @param sensorL dolni senzor
 	 */
 	private void drawTank(Graphics2D g2, int x, int y, Color color1, Color color2, int vyskaNaplne, Napln napln, String sensorH, String sensorL) {
 		//Kresleni naplne tanku
 		Color kapalina = Color.WHITE;
-		if(napln == Napln.LIH) kapalina = LIH;
+		if(napln == Napln.LOUH) kapalina = LOUH;
 		if(napln == Napln.VODA) kapalina = VODA;
 		g2.setColor(kapalina);
 		g2.fillRect(x,(int)(y + ((100 - vyskaNaplne) / 100.0) * VYSKA_TANKU), SIRKA_TANKU, (int)((vyskaNaplne / 100.0) * VYSKA_TANKU));
@@ -694,12 +749,12 @@ public class DrawingPanel extends Component {
 	}
 	
 	/**
-	 * Stav, ve kterem se plni tank1 lihem
+	 * Stav, ve kterem se plni tank1 louhem
 	 */
 	private void stavA1() {
 		V1 = LOG_JEDN;
 		V3 = LOG_JEDN;
-		NTank1 = Napln.LIH;
+		NTank1 = Napln.LOUH;
 		tank1 += RYCHLOST_PRUTOKU;
 		repaint();
 		if(LA01 == LOG_JEDN) {
@@ -708,12 +763,14 @@ public class DrawingPanel extends Component {
 			V3 = LOG_NULA;
 			stav1 = NEAKTIVNI_STAV;
 			stav2 = AKTIVNI_STAV;
-			vystup = "V10 + V30 + V51 + P1";
+			vystup = "Zaviram ventily V1 a V3 + oteviram ventil V5 + spoustim cerpadlo";
+			vstupText = "Tank 1 naplnen";
+			phTanku = 100;
 		}
 	}
 	
 	/**
-	 * Stav, ve kterem se z tanku1 cerpa lih dokud neni zcela vycerpan
+	 * Stav, ve kterem se z tanku1 cerpa louh dokud neni zcela vycerpan
 	 */
 	private void stavA2() {
 		cerpadlo = LOG_JEDN;
@@ -726,7 +783,8 @@ public class DrawingPanel extends Component {
 			V5 = LOG_NULA;
 			stav2 = NEAKTIVNI_STAV;
 			stav3 = AKTIVNI_STAV;
-			vystup = "V21 + V31 + V50 + P0";
+			vystup = "Oteviram ventily V2 a V3 + zaviram ventil V5 + vypinam cerpadlo";
+			vstupText = "Tank 1 vypusten";
 		}
 	}
 	
@@ -741,10 +799,10 @@ public class DrawingPanel extends Component {
 		tank1 += RYCHLOST_PRUTOKU;
 		if(LA01 == LOG_JEDN) {
 			stav++;
-			phTanku = 100;
 			stav3 = NEAKTIVNI_STAV;
 			stav4 = AKTIVNI_STAV;
-			vystup = "V51 + V71";
+			vystup = "Oteviram ventily V5 a V7";
+			vstupText = "Tank 1 naplnen";
 		}
 	}
 	
@@ -755,10 +813,9 @@ public class DrawingPanel extends Component {
 		V5 = LOG_JEDN;
 		V7 = LOG_JEDN;
 		ph = LOG_NULA;
-		phTanku -= 1;
-		if(tank1 >= 25) {
-			tank1 -= RYCHLOST_PRUTOKU/2;
-		}
+		double random_ph = r.nextDouble();
+		phTanku -= 1 * random_ph;
+		tank1 -= RYCHLOST_PRUTOKU/2;
 		repaint();
 		if(phTanku <= 0) {
 			stav++;
@@ -767,7 +824,17 @@ public class DrawingPanel extends Component {
 			ph = LOG_JEDN;
 			stav4 = NEAKTIVNI_STAV;
 			stav5 = AKTIVNI_STAV;
-			vystup = "V20 + V30";
+			vystup = "Zaviram ventily V2 a V3";
+			vstupText = "PH kleslo pod pozadovanou mez";
+		}
+		if(LA02 == LOG_NULA) {
+			stav--;
+			stav4 = NEAKTIVNI_STAV;
+			stav3 = AKTIVNI_STAV;
+			V5 = LOG_NULA;
+			V7 = LOG_NULA;
+			vystup = "Zaviram ventily V5 a V7";
+			vstupText = "Tank 1 vypusten";
 		}
 	}
 	
@@ -786,17 +853,18 @@ public class DrawingPanel extends Component {
 			beziAkce = false;
 			stav5 = NEAKTIVNI_STAV;
 			stav0 = AKTIVNI_STAV;
-			vystup = "V50 + V70";
+			vystup = "Zaviram ventily V5 a V7";
+			vstupText = "Tank 1 vypusten";
 		}
 	}
 	
 	/**
-	 * Stav, ve kterem se plni tank2 lihem
+	 * Stav, ve kterem se plni tank2 louhem
 	 */
 	private void stavB1() {
 		V1 = LOG_JEDN;
 		V4 = LOG_JEDN;
-		NTank2 = Napln.LIH;
+		NTank2 = Napln.LOUH;
 		tank2 += RYCHLOST_PRUTOKU;
 		repaint();
 		if(LA03 == LOG_JEDN) {
@@ -805,12 +873,14 @@ public class DrawingPanel extends Component {
 			V4 = LOG_NULA;
 			stav6 = NEAKTIVNI_STAV;
 			stav7 = AKTIVNI_STAV;
-			vystup = "V10 + V40 + V61 + P1";
+			vystup = "Zaviram ventily V1 a V4 + oteviram ventil V6 + zapinam cerpadlo";
+			vstupText = "Tank 2 naplnen";
+			phTanku = 100;
 		}
 	}
 	
 	/**
-	 * Stav, ve kterem se z tanku2 cerpa lih dokud neni zcela vycerpan
+	 * Stav, ve kterem se z tanku2 cerpa louh dokud neni zcela vycerpan
 	 */
 	private void stavB2() {
 		cerpadlo = LOG_JEDN;
@@ -823,7 +893,8 @@ public class DrawingPanel extends Component {
 			V6 = LOG_NULA;
 			stav7 = NEAKTIVNI_STAV;
 			stav8 = AKTIVNI_STAV;
-			vystup = "V21 + V41 + V60 + P0";
+			vystup = "Oteviram ventily V2 a V4 + zaviram ventil V6 + vypinam cerpadlo";
+			vstupText = "Tank 2 vypusten";
 		}
 	}
 	
@@ -838,10 +909,10 @@ public class DrawingPanel extends Component {
 		tank2 += RYCHLOST_PRUTOKU;
 		if(LA03 == LOG_JEDN) {
 			stav++;
-			phTanku = 100;
 			stav8 = NEAKTIVNI_STAV;
 			stav9 = AKTIVNI_STAV;
-			vystup = "V61 + V71";
+			vystup = "Oteviram ventily V6 a V7";
+			vstupText = "Tank 2 naplnen";
 		}
 	}
 	
@@ -852,10 +923,9 @@ public class DrawingPanel extends Component {
 		V6 = LOG_JEDN;
 		V7 = LOG_JEDN;
 		ph = LOG_NULA;
-		phTanku -= 1;
-		if(tank2 >= 25) {
-			tank2 -= RYCHLOST_PRUTOKU/2;
-		}
+		double random_ph = r.nextDouble();
+		phTanku -= 1 * random_ph;
+		tank2 -= RYCHLOST_PRUTOKU/2;
 		repaint();
 		if(phTanku <= 0) {
 			stav++;
@@ -864,7 +934,17 @@ public class DrawingPanel extends Component {
 			ph = LOG_JEDN;
 			stav9 = NEAKTIVNI_STAV;
 			stav10 = AKTIVNI_STAV;
-			vystup = "V20 + V40";
+			vstupText = "PH kleslo pod pozadovanou mez";
+			vystup = "Zaviram ventily V2 a V4";
+		}
+		if(LA04 == LOG_NULA) {
+			stav--;
+			stav9 = NEAKTIVNI_STAV;
+			stav8 = AKTIVNI_STAV;
+			V6 = LOG_NULA;
+			V7 = LOG_NULA;
+			vystup = "Zaviram ventily V6 a V7";
+			vstupText = "Tank 2 vypusten";
 		}
 	}
 	
@@ -883,7 +963,8 @@ public class DrawingPanel extends Component {
 			beziAkce = false;
 			stav10 = NEAKTIVNI_STAV;
 			stav0 = AKTIVNI_STAV;
-			vystup = "V60 + V70";
+			vystup = "Zaviram ventily V6 a V7";
+			vstupText = "Tank 2 vypusten";
 		}
 	}
 	
@@ -893,33 +974,33 @@ public class DrawingPanel extends Component {
 	private void manualniOvladani() {
 		if(V1 == LOG_JEDN && V3 == LOG_JEDN) {
 			if(tank1 > 0 && NTank1 == Napln.VODA) {
-				vypisChybu("Warning", "Nelze michat lih s vodou!");
+				vypisChybu("Warning", "Nelze michat louh s vodou!");
 				V1 = LOG_NULA;
 				V3 = LOG_NULA;
 				return;
 			}
 			tank1 += RYCHLOST_PRUTOKU;
-			NTank1 = Napln.LIH;
+			NTank1 = Napln.LOUH;
 			if(tank1 > 100) {
 				tank1 = 100;
 			}
 		}
 		if(V1 == LOG_JEDN && V4 == LOG_JEDN) {
 			if(tank2 > 0 && NTank2 == Napln.VODA) {
-				vypisChybu("Warning", "Nelze michat lih s vodou!");
+				vypisChybu("Warning", "Nelze michat louh s vodou!");
 				V1 = LOG_NULA;
 				V4 = LOG_NULA;
 				return;
 			}
 			tank2 += RYCHLOST_PRUTOKU;
-			NTank2 = Napln.LIH;
+			NTank2 = Napln.LOUH;
 			if(tank2 > 100) {
 				tank2 = 100;
 			}
 		}
 		if(V3 == LOG_JEDN && V2 == LOG_JEDN) {
-			if(tank1 > 0 && NTank1 == Napln.LIH) {
-				vypisChybu("Warning", "Nelze michat vodu s lihem!");
+			if(tank1 > 0 && NTank1 == Napln.LOUH) {
+				vypisChybu("Warning", "Nelze michat vodu s louhem!");
 				V3 = LOG_NULA;
 				V2 = LOG_NULA;
 				return;
@@ -931,8 +1012,8 @@ public class DrawingPanel extends Component {
 			}
 		}
 		if(V2 == LOG_JEDN && V4 == LOG_JEDN) {
-			if(tank2 > 0 && NTank2 == Napln.LIH) {
-				vypisChybu("Warning", "Nelze michat vodu s lihem!");
+			if(tank2 > 0 && NTank2 == Napln.LOUH) {
+				vypisChybu("Warning", "Nelze michat vodu s louhem!");
 				V2 = LOG_NULA;
 				V4 = LOG_NULA;
 				return;
@@ -944,8 +1025,8 @@ public class DrawingPanel extends Component {
 			}
 		}
 		if(V5 == LOG_JEDN && V7 == LOG_JEDN) {
-			if(tank1 > 0 && NTank1 == Napln.LIH) {
-				vypisChybu("Warning", "Je zakazano vylevat lih potrubim!");
+			if(tank1 > 0 && NTank1 == Napln.LOUH) {
+				vypisChybu("Warning", "Je zakazano vylevat louh potrubim!");
 				V5 = LOG_NULA;
 				V7 = LOG_NULA;
 				return;
@@ -957,8 +1038,8 @@ public class DrawingPanel extends Component {
 			}
 		}
 		if(V6 == LOG_JEDN && V7 == LOG_JEDN) {
-			if(tank2 > 0 && NTank2 == Napln.LIH) {
-				vypisChybu("Warning", "Je zakazano vylevat lih potrubim!");
+			if(tank2 > 0 && NTank2 == Napln.LOUH) {
+				vypisChybu("Warning", "Je zakazano vylevat louh potrubim!");
 				V6 = LOG_NULA;
 				V7 = LOG_NULA;
 				return;
@@ -971,7 +1052,7 @@ public class DrawingPanel extends Component {
 		}
 		if(V6 == LOG_JEDN && cerpadlo == LOG_JEDN) {
 			if(tank2 > 0 && NTank2 == Napln.VODA) {
-				vypisChybu("Warning", "Nelze cerpat vodu k lihu!");
+				vypisChybu("Warning", "Nelze cerpat vodu k louhu!");
 				V6 = LOG_NULA;
 				cerpadlo = LOG_NULA;
 				return;
@@ -984,7 +1065,7 @@ public class DrawingPanel extends Component {
 		}
 		if(V5 == LOG_JEDN && cerpadlo == LOG_JEDN) {
 			if(tank1 > 0 && NTank1 == Napln.VODA) {
-				vypisChybu("Warning", "Nelze cerpat vodu k lihu!");
+				vypisChybu("Warning", "Nelze cerpat vodu k louhu!");
 				V6 = LOG_NULA;
 				cerpadlo = LOG_NULA;
 				return;
@@ -1030,12 +1111,12 @@ public class DrawingPanel extends Component {
 	private void inicializacePopisuStavu() {
 		popis = new String[11];
 		popis[0] = "System je v necinnosti";
-		popis[1] = "Tank A se napousti lihem";
+		popis[1] = "Tank A se napousti louhem";
 		popis[2] = "Tanku A se precerpava cerpadlem";
 		popis[3] = "Tank A se plni vodou";
 		popis[4] = "Tank A se proplachuje dokud neni ph v normalu";
 		popis[5] = "Tank A se vypousti";
-		popis[6] = "Tank B se napousti lihem";
+		popis[6] = "Tank B se napousti louhem";
 		popis[7] = "Tanku B se precerpava cerpadlem";
 		popis[8] = "Tank B se plni vodou";
 		popis[9] = "Tank B se proplachuje dokud neni ph v normalu";
@@ -1083,10 +1164,10 @@ public class DrawingPanel extends Component {
 		}
 		
 		/**
-		 * Stav, ve kterem se plni tank1 lihem
+		 * Stav, ve kterem se plni tank1 louhem
 		 */
 		private void stav1() {
-			NTank1 = Napln.LIH;
+			NTank1 = Napln.LOUH;
 			V1 = LOG_JEDN;
 			V3 = LOG_JEDN;
 			repaint();
@@ -1099,12 +1180,13 @@ public class DrawingPanel extends Component {
 				tank1 = 100;
 				stav1 = NEAKTIVNI_STAV;
 				stav2 = AKTIVNI_STAV;
-				vystup = "V10 + V30 + V51 + P1";
+				vystup = "Zaviram ventily V1 a V3 + oteviram ventil V5 + spoustim cerpadlo";
+				vstupText = "Tank 1 naplnen";
 			}
 		}
 		
 		/**
-		 * Stav, ve kterem se z tanku1 cerpa lih dokud neni zcela vycerpan
+		 * Stav, ve kterem se z tanku1 cerpa louh dokud neni zcela vycerpan
 		 */
 		private void stav2() {
 			repaint();
@@ -1117,7 +1199,8 @@ public class DrawingPanel extends Component {
 				V2 = LOG_JEDN;
 				stav2 = NEAKTIVNI_STAV;
 				stav3 = AKTIVNI_STAV;
-				vystup = "V21 + V31 + V50 + P0";
+				vystup = "Oteviram ventily V2 a V3 + zaviram ventil V5 + vypinam cerpadlo";
+				vstupText = "Tank 1 vypusten";
 			}
 		}
 		
@@ -1135,7 +1218,8 @@ public class DrawingPanel extends Component {
 				V7 = LOG_JEDN;
 				stav3 = NEAKTIVNI_STAV;
 				stav4 = AKTIVNI_STAV;
-				vystup = "V51 + V71";
+				vystup = "Oteviram ventily V5 a V7";
+				vstupText = "Tank 1 naplnen";
 			}
 		}
 		
@@ -1152,7 +1236,18 @@ public class DrawingPanel extends Component {
 				tank1 = 25;
 				stav4 = NEAKTIVNI_STAV;
 				stav5 = AKTIVNI_STAV;
-				vystup = "V20 + V30";
+				vystup = "Zaviram ventily V2 a V3";
+				vstupText = "PH kleslo pod pozadovanou mez";
+			}
+			if(vstup.equals("J")) {
+				stav--;
+				stav4 = NEAKTIVNI_STAV;
+				stav3 = AKTIVNI_STAV;
+				V5 = LOG_NULA;
+				V7 = LOG_NULA;
+				vystup = "Zaviram ventily V5 a V7";
+				vstupText = "Tank 1 vypusten";
+				tank1 = 0;
 			}
 		}
 		
@@ -1173,17 +1268,18 @@ public class DrawingPanel extends Component {
 				beziAkce = false;
 				stav5 = NEAKTIVNI_STAV;
 				stav0 = AKTIVNI_STAV;
-				vystup = "V50 + V70";
+				vystup = "Zaviram ventily V5 a V7";
+				vstupText = "Tank 1 vypusten";
 			}
 		}
 		
 		/**
-		 * Stav, ve kterem se plni tank2 lihem
+		 * Stav, ve kterem se plni tank2 louhemem
 		 */
 		private void stav6() {
 			V1 = LOG_JEDN;
 			V4 = LOG_JEDN;
-			NTank2 = Napln.LIH;
+			NTank2 = Napln.LOUH;
 			repaint();
 			if(vstup.equals("O")) {
 				stav++;
@@ -1194,12 +1290,13 @@ public class DrawingPanel extends Component {
 				cerpadlo = LOG_JEDN;
 				V6 = LOG_JEDN;
 				tank2 = 100;
-				vystup = "V10 + V40 + V61 + P1";
+				vystup = "Zaviram ventily V1 a V4 + oteviram ventil V6 + zapinam cerpadlo";
+				vstupText = "Tank 2 naplnen";
 			}
 		}
 		
 		/**
-		 * Stav, ve kterem se z tanku2 cerpa lih dokud neni zcela vycerpan
+		 * Stav, ve kterem se z tanku2 cerpa louh dokud neni zcela vycerpan
 		 */
 		private void stav7() {
 			repaint();
@@ -1212,7 +1309,8 @@ public class DrawingPanel extends Component {
 				V2 = LOG_JEDN;
 				V4 = LOG_JEDN;
 				tank2 = 0;
-				vystup = "V21 + V41 + V60 + P0";
+				vystup = "Oteviram ventily V2 a V4 + zaviram ventil V6 + vypinam cerpadlo";
+				vstupText = "Tank 2 vypusten";
 			}
 		}
 		
@@ -1230,7 +1328,8 @@ public class DrawingPanel extends Component {
 				V7 = LOG_JEDN;
 				ph = LOG_NULA;
 				tank2 = 100;
-				vystup = "V61 + V71";
+				vystup = "Oteviram ventily V6 a V7";
+				vstupText = "Tank 2 naplnen";
 			}
 		}
 		
@@ -1249,7 +1348,18 @@ public class DrawingPanel extends Component {
 				V6 = LOG_JEDN;
 				V7 = LOG_JEDN;
 				tank2 = 25;
-				vystup = "V20 + V40";
+				vstupText = "PH kleslo pod pozadovanou mez";
+				vystup = "Zaviram ventily V2 a V4";
+			}
+			if(vstup.equals("K")) {
+				stav--;
+				stav9 = NEAKTIVNI_STAV;
+				stav8 = AKTIVNI_STAV;
+				V6 = LOG_NULA;
+				V7 = LOG_NULA;
+				vystup = "Zaviram ventily V6 a V7";
+				vstupText = "Tank 2 vypusten";
+				tank2 = 0;
 			}
 		}
 		
@@ -1266,7 +1376,8 @@ public class DrawingPanel extends Component {
 				stav10 = NEAKTIVNI_STAV;
 				stav0 = AKTIVNI_STAV;
 				tank2 = 0;
-				vystup = "V60 + V70";
+				vystup = "Zaviram ventily V6 a V7";
+				vstupText = "Tank 2 vypusten";
 			}
 		}
 }
