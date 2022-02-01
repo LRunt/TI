@@ -138,24 +138,24 @@ Na následujícím obrázku je přechodový graf konečného automatu.
 \subsection{Snímače}
 Model automatu obsahuje následující signály od snímačů:
  
-LA011 - Hladina dosahuje maxima tanku A \newline 
-LA010 - Hladina nedosahuje maxima tanku A \newline 
-LA021 - Hladina dosahuje minima tanku A \newline 
-LA020 - Hladina nedosahuje minima tanku A \newline 
-LA031 - Hladina dosahuje maxima tanku B \newline
-LA030 - Hladina nedosahuje maxima tanku B \newline 
-LA041 - Hladina nedosahuje minima tanku B \newline 
-LA040 - Hladina dosahuje minima tanku B
+LA011 - Hladina překročila úroveň maxima tanku A \newline 
+LA010 - Hladina klesla pod úroveň maxima tanku A \newline 
+LA021 - Hladina překročila úroveň minima tanku A \newline 
+LA020 - Hladina klesla pod úroveň minima tanku A \newline 
+LA031 - Hladina překročila úroveň maxima tanku B \newline
+LA030 - Hladina klesla pod úroveň maxima tanku B \newline 
+LA041 - Hladina překročila úroveň minima tanku B \newline 
+LA040 - Hladina klesla pod úroveň minima tanku B
 
 \subsection{Řídící signály}
 Model automatu obsahuje následující řídící signály:
 
-P0 - Čerpadlo vypnuto \newline 
-P1 - Čerpadlo zapnuto \newline 
-Vi0 - Ventil i zavřen \newline 
-Vi1 - Ventil i otevřen \newline 
-Q0 - Ph nad požadovanou mezí \newline 
-Q1 - Ph pod požadovanou mezí 
+P0 - Vypínám čerpadlo \newline 
+P1 - Zapínám čerpadlo \newline 
+Vi0 - Zavírám ventil \newline 
+Vi1 - Otevírám ventil \newline 
+Q0 - Ph se dostalo nad požadovanou mez \newline 
+Q1 - Ph se dostalo pod požadovanou mez 
 
 \newpage
 \subsection{Řízení operátora}
@@ -184,7 +184,7 @@ Tato knihovna vytváří okno v metodě \texttt{main()}, které má pevně stano
 Každá komponenta má svoji proměnnou, která uchovává její stav. Tento stav se poté promítá do výsledného grafického výstupu. Stavy komponent jsou reprezentovány barvami. Zelená znamená logickou 1 a červená logickou 0. Toto neplatí u žárovky, která je při logické 1 žlutá a při logické 0 šedá. Komponenta tanku je pak řešena tak, že uchovává data o její plnosti v procentech a druh jejího obsahu (voda, líh, vzduch), který je řešen pomocí enumu \texttt{Napln}. Stav označený zeleně v přechodovém grafu značí aktuální stav. Ostatiní stavy mají bílou barvu.
 
 \vspace{0.25cm}
-Stavy modelu jsou realizovány pomocí proměnné \texttt{stav} datového typu \texttt{Integer}. V programu je zabudovaný \texttt{timer}, který každých \texttt{50ms} spustí metodu \newline \texttt{zjistiStav()}, která zjistí stav a následně podle toho spustí metodu příslušející aktuálnímu stavu modelu, pokud je aktivováno automatické simulování. Každý stav pak vykonává nějakou pro něj typickou činnost (plnění tanku, čerpání lihu z nádrže, atd.), dokud není splněna podmínka (např.: pro stav 1 snímač LA01 je v logické 1), pokud je potřebná podmínka splněna, model se přesouvá do dalšího stavu (uložení do proměnné \texttt{stav} příslušné hodnoty). metody stavů jsou nazvány \texttt{stav[A|B][1|2|3|4|5]}. Pro aktualizování stavu snímačů slouží metoda \texttt{aktualizujStav()}, která kontroluje, zda má snímač posílat logickou 1 nebo 0. Pokud automatické simulování zapnuto není, vyhodnocuje se stav automatu vždy po stlačení klávesy. Zde uživatel ovládá snímače manuálně pomocí klávesnice, tedy do dalších stavů se přechází jen pomocí uživatelova činu. Po zmáčknutí se spouští metoda \texttt{zjistiStavManual()}, která zjistí stav a podle toho spustí příšlušnou metody \texttt{stav[1|2|3|4|5|6|7|8|9|10]}, která rozhodne co model udělá. 
+Stavy modelu jsou realizovány pomocí proměnné \texttt{stav} datového typu \texttt{Integer}. Do dalšího stavu, se dostaneme pomocí snímačů, které jsou simulovány uživatelem. Zde uživatel ovládá snímače manuálně pomocí klávesnice, tedy do dalších stavů se přechází jen pomocí uživatelova činu. Po zmáčknutí klávesy se spouští metoda \texttt{zjistiStavManual()}, která zjistí stav a podle toho spustí příšlušnou metodu \texttt{stav[1|2|3|4|5|6|7|8|9|10]}, která rozhodne jestli přišel pulz ze snímače, kterým se přechází do dalšího stavu a následně provádí případné změny modelu.  
 
 \vspace{0.25cm}
 Reakce na uživatele je vyřešena pomocí metody \texttt{keyListener()}, rozeznávající, která klávesa byla stisknuta nebo uvolněna. Díky této metodě lze spouštět jednotlivé sanitace a manuálně ovládat model, avšak manuální ovládání je povoleno jen, když je konečný automat ve stavu 0. K zjištění, zda je ovládání povoleno slouží metoda \texttt{isManualniPovoleno()}. Jestliže chce uživatel spustit akci, která nemůže být spuštěna z důvodu chybového stavu, je zavolána metoda \texttt{vypisChybu()}, která vypíše ve vyskakovacím okně chybu a rozsvítí žárovku, která zhasne po zavření okna, které se zobrazilo.
@@ -201,7 +201,7 @@ Aplikace se spouští pomocí příkazu v příkazové řádce. Před zadáním 
 \label{spusteni}
 \end{figure}
 
-Pokud se program podaří spustit zobrazí se model sanitarizace tanků s přechodovým grafem na pravé straně \ref{vzhled}.
+Pokud se program podaří spustit zobrazí se model sanitarizace tanků s přechodovým grafem na pravé straně viz. obrázek \ref{vzhled}.
 
 \begin{figure}[h]
 \centering 
@@ -216,6 +216,7 @@ Pokud se program podaří spustit zobrazí se model sanitarizace tanků s přech
 \caption{Vzhled aplikace při provozu}
 \end{figure}
 
+\newpage
 \subsection{Ovládání aplikace}
 Po spuštění se zobrazí model ve stavu 0. Červená barva znamená logickou 0, tedy ventil je zavřený, tlačítko není stlačeno, ph není v požadované mezi, čerpadlo nečerpá líh, hladina v tanku není výš než snímač. Zelená barva znamená naopak logickou 1, tedy ventil je otevřený, tlačítko je stlačeno, atd. Žárovka má své barvy a to šedou pokud nesvítí a žlutou pokud svítí. Voda je znázorněna modrou barvou a líh barvou šedou.
 
@@ -239,7 +240,7 @@ Po spuštění se zobrazí model ve stavu 0. Červená barva znamená logickou 0
 \caption{Vzhledy tanků při různé náplni}
 \end{figure}
 
-Aplikace se ovládá pomocí klávesnice. Uživatel má k dispozici ovládací panel (Spouštění sanitace nádrží) a manuální ovládání, které zahrnuje ovládání jednotlivých ventilů, snímačů a čerpadla. Při implementaci byla snaha o intuitivní ovládání, tedy ventily se ovládají pomocí jejich čísla, ostatní prvky se ovládají pomocí písmenka, kterým je daný prvek pojmenovaný. Snímače v tancích už bohužel moc intuitivní nejsou. Ovládají se pomocí kláves I, J, O, K. Uživatel si může vybrat, zda se snímače budou ovládat sami, nebo pomocí klávesnice. Po spuštění programu je nastaveno ovládání snímačů pomocí klávesnice, tedy automat bude mezi stavy přecházet až po stisknutí klávesy. Automatická simulace pak vyhodnocuje snímače sama pomocí plnosti tanků, nebo ph v trubkách. Díky této simulaci, pak dokáže vyhodnotit, kdy přejde do dalšího stavu. Mezi těmito dvěma módy se dá přepínat pomocí klávesy S. Podrobný výčet ovládání je uveden níže \ref{ovladani}. 
+Aplikace se ovládá pomocí klávesnice. Uživatel má k dispozici ovládací panel (Spouštění sanitace nádrží) a manuální ovládání, které zahrnuje ovládání jednotlivých ventilů, snímačů a čerpadla. Při implementaci byla snaha o intuitivní ovládání, tedy ventily se ovládají pomocí jejich čísla, ostatní prvky se ovládají pomocí písmenka, kterým je daný prvek pojmenovaný. Snímače v tancích už bohužel moc intuitivní nejsou. Ovládají se pomocí kláves I, J, O, K. Pro přechod do dalšího stavu je potřeba aby uživatel zmáčkl klávesu příslušného snímače nebo tlačítka, tedy automat bude mezi stavy přecházet až po stisknutí správné klávesy. Podrobný výčet ovládání je uveden níže \ref{ovladani}. 
 
 \begin{figure}[h]
 \centering 
@@ -258,14 +259,14 @@ Pro sledování v jakém stavu se automat nachází je připravena pravá strana
 
 \begin{enumerate}
   \item Stav, ve kterém se automat nachází
-  \item Popis děje, který se děje v tomto stavu
+  \item Vstup, který přiměl ke změnu stavu
   \item Výstupní signály od snímače (resp. operátora), který vyvolal předchozí přechod
-  \item Indikátor, zda je zapnuta automatická simulace
+  \item Popis děje, který se děje v tomto stavu
 \end{enumerate}
 
 Pod tímto měnícím se textem je vykreslen přechodový graf, který značí ve kterém stavu se automat nachází. Tento stav je zvýrazněn zeleně. U šipek přechodů je napsáno co příslušný přechod vyvolává, v závorce je pak klávesa, kterou se dá daný snímač ovládat.
 
-\begin{figure}[h]
+\begin{figure}[h!]
 \centering 
 \includegraphics[width=8cm]{pa}
 \caption{Přechodový graf v aplikaci}
@@ -275,7 +276,7 @@ Aplikace počítá s neobvyklým zacházením. Jsou tedy ošetřeny stavy, při 
 
 \begin{figure}[h!]
 \centering 
-\includegraphics[width=8cm]{chyba}
+\includegraphics[width=9cm]{chyba}
 \caption{Ukázka chybového stavu}
 \end{figure}
 
