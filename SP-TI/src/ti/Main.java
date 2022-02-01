@@ -1,8 +1,5 @@
 package ti;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import javax.swing.JFrame;
 
 /**
@@ -31,16 +28,6 @@ public class Main {
 				okno.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//skonceni po zavreni okna
 				okno.setLocationRelativeTo(null);//vycentrovat na obrazovce
 				okno.setVisible(true);
-				
-				Timer tm = new Timer();
-				tm.schedule(new TimerTask() {
-					@Override
-					public void run() {
-						if(panel.simulace) {
-							panel.zjistiStav();
-						}
-					}
-				}, 0, 50);
 	}
 
 }

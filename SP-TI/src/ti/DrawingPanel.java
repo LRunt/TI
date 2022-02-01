@@ -47,10 +47,6 @@ public class DrawingPanel extends Component {
 	private final Color ZAROVKA_SVITI = Color.YELLOW;
 	/** Jak se rychle budou napustet a vypoustet tanky */
 	private final int RYCHLOST_PRUTOKU = 2;
-	/** Pri kolika procentech naplneni bude mit horni cidlo tanku logickou jednicku*/
-	private final int HORNI_CIDLO = 100;
-	/** Pri kolika procentech naplneni bude mit dolni cidlo tanku logickou jednicku*/
-	private final int DOLNI_CIDLO = 1; 
 	private FontMetrics font;
 	/** zda jsou filtrovany tanky */
 	private boolean beziAkce = false;
@@ -95,9 +91,6 @@ public class DrawingPanel extends Component {
 	private Napln NTank2 = Napln.NIC;
 	/** V jakem stavu procesu jsme 0 - nic se nedeje */
 	private int stav;
-	private double phTanku;
-	/** Rozhoduje zda bude automaticka simulace vypnuta nebo zapnuta*/
-	public boolean simulace = false;
 	private String vstup = "";
 
 	/**
@@ -138,7 +131,6 @@ public class DrawingPanel extends Component {
 				if (e.getKeyChar() == 'A' || e.getKeyChar() == 'a') {
 					tlacitkoA = LOG_NULA;
 					repaint();
-					stavA1();
 				}
 				if (e.getKeyChar() == 'B' || e.getKeyChar() == 'b') {
 					tlacitkoB = LOG_NULA;
@@ -304,15 +296,6 @@ public class DrawingPanel extends Component {
 						repaint();
 					}
 				}
-				if (e.getKeyChar() == 'S' || e.getKeyChar() == 's') {
-					simulace = !simulace;
-					repaint();
-					if(simulace) {
-						ph = LOG_JEDN;
-					}else {
-						ph = LOG_NULA;
-					}
-				}
 				if (e.getKeyChar() == 'Q' || e.getKeyChar() == 'q') {
 					ph = LOG_JEDN;
 					vstup = "Q";
@@ -362,9 +345,6 @@ public class DrawingPanel extends Component {
 	 * @param g2 grafika
 	 */
 	private void drawModel(Graphics2D g2) {
-		if(simulace) {
-			aktualizujStav();
-		}
 		g2.setFont(new Font("Calibri", Font.BOLD, VELIKOST_TEXTU));
 		font = g2.getFontMetrics();
 		g2.setColor(Color.WHITE);
@@ -432,11 +412,6 @@ public class DrawingPanel extends Component {
 		//Stav
 		g2.drawString("Stav: " + stav, 600, 50);
 		g2.drawString("Popis: " + popis[stav], 600, 125);
-		if(simulace) {
-			g2.drawString("Automaticka simulace: ZAPNUTO", 600, 150);
-		}else {
-			g2.drawString("Automaticka simulace: VYPNUTO", 600, 150);
-		}
 		g2.drawString("Vstup: " + vstupText, 600, 75);
 		g2.drawString("Vystup: " + vystup, 600, 100);
 		AffineTransform oldTr1 = g2.getTransform();
@@ -674,298 +649,6 @@ public class DrawingPanel extends Component {
 		g2.setColor(CARA);
 		g2.drawOval(x - VELIKOST_STAVU/2, y - VELIKOST_STAVU/2, VELIKOST_STAVU, VELIKOST_STAVU);
 		g2.drawString(text, x - font.stringWidth(text)/2, y + 7);
-	}
-	
-	/**
-	 * Metoda aktrualizuje stav v modelu (vetsinou kontrola snimacu) 
-	 */
-	private void aktualizujStav() {
-		//tank1
-		if(tank1 > 100) tank1 = 100;
-		if(tank1 < 0) tank1 = 0;
-		if(tank1 >= HORNI_CIDLO) {
-			LA01 = LOG_JEDN;
-			LA02 = LOG_JEDN;
-		} else if(tank1 >= DOLNI_CIDLO) {
-			LA01 = LOG_NULA;
-			LA02 = LOG_JEDN;
-		} else {
-			LA01 = LOG_NULA;
-			LA02 = LOG_NULA;
-		}
-		//tank2
-		if(tank2 > 100) tank2 = 100;
-		if(tank2 < 0) tank2 = 0;
-		if(tank2 >= HORNI_CIDLO) {
-			LA03 = LOG_JEDN;
-			LA04 = LOG_JEDN;
-		} else if(tank2 >= DOLNI_CIDLO) {
-			LA03 = LOG_NULA;
-			LA04 = LOG_JEDN;
-		} else {
-			LA03 = LOG_NULA;
-			LA04 = LOG_NULA;
-		}
-	}
-	
-	/**
-	 * Konecny automat, podle stavu se spusti dalsi metoda
-	 */
-	public void zjistiStav(){
-		switch(stav) {
-		  case 1:
-		    stavA1();
-		    break;
-		  case 2:
-		    stavA2();
-		    break;
-		  case 3:
-			stavA3();
-			break;
-		  case 4:
-			stavA4();
-			break;
-		  case 5:
-			stavA5();
-			break;
-		  case 6:
-			stavB1();
-			break;
-		  case 7:
-			stavB2();
-			break;
-		  case 8:
-		    stavB3();
-			break;
-		  case 9:
-		    stavB4();
-			break;
-		  case 10:
-			stavB5();
-			break;
-		  default:
-		}
-
-	}
-	
-	/**
-	 * Stav, ve kterem se plni tank1 louhem
-	 */
-	private void stavA1() {
-		V1 = LOG_JEDN;
-		V3 = LOG_JEDN;
-		NTank1 = Napln.LOUH;
-		tank1 += RYCHLOST_PRUTOKU;
-		repaint();
-		if(LA01 == LOG_JEDN) {
-			stav++;
-			V1 = LOG_NULA;
-			V3 = LOG_NULA;
-			stav1 = NEAKTIVNI_STAV;
-			stav2 = AKTIVNI_STAV;
-			vystup = "Zaviram ventily V1 a V3 + oteviram ventil V5 + spoustim cerpadlo";
-			vstupText = "Tank 1 naplnen";
-			phTanku = 100;
-		}
-	}
-	
-	/**
-	 * Stav, ve kterem se z tanku1 cerpa louh dokud neni zcela vycerpan
-	 */
-	private void stavA2() {
-		cerpadlo = LOG_JEDN;
-		V5 = LOG_JEDN;
-		tank1 -= RYCHLOST_PRUTOKU;
-		repaint();
-		if(LA02 == LOG_NULA) {
-			stav++;
-			cerpadlo = LOG_NULA;
-			V5 = LOG_NULA;
-			stav2 = NEAKTIVNI_STAV;
-			stav3 = AKTIVNI_STAV;
-			vystup = "Oteviram ventily V2 a V3 + zaviram ventil V5 + vypinam cerpadlo";
-			vstupText = "Tank 1 vypusten";
-		}
-	}
-	
-	/**
-	 * Stav, ve kterem se tank1 plni vodou
-	 */
-	private void stavA3() {
-		NTank1 = Napln.VODA;
-		V3 = LOG_JEDN;
-		V2 = LOG_JEDN;
-		repaint();
-		tank1 += RYCHLOST_PRUTOKU;
-		if(LA01 == LOG_JEDN) {
-			stav++;
-			stav3 = NEAKTIVNI_STAV;
-			stav4 = AKTIVNI_STAV;
-			vystup = "Oteviram ventily V5 a V7";
-			vstupText = "Tank 1 naplnen";
-		}
-	}
-	
-	/**
-	 * Stav, ve kterem se proplachuje tank1 vodou dokud neni ph v norme 
-	 */
-	private void stavA4() {
-		V5 = LOG_JEDN;
-		V7 = LOG_JEDN;
-		ph = LOG_NULA;
-		double random_ph = r.nextDouble();
-		phTanku -= 1 * random_ph;
-		tank1 -= RYCHLOST_PRUTOKU/2;
-		repaint();
-		if(phTanku <= 0) {
-			stav++;
-			V3 = LOG_NULA;
-			V2 = LOG_NULA;
-			ph = LOG_JEDN;
-			stav4 = NEAKTIVNI_STAV;
-			stav5 = AKTIVNI_STAV;
-			vystup = "Zaviram ventily V2 a V3";
-			vstupText = "PH kleslo pod pozadovanou mez";
-		}
-		if(LA02 == LOG_NULA) {
-			stav--;
-			stav4 = NEAKTIVNI_STAV;
-			stav3 = AKTIVNI_STAV;
-			V5 = LOG_NULA;
-			V7 = LOG_NULA;
-			vystup = "Zaviram ventily V5 a V7";
-			vstupText = "Tank 1 vypusten";
-		}
-	}
-	
-	/**
-	 * Vypousteni zbytku vody z tanku1
-	 */
-	private void stavA5() {
-		V5 = LOG_JEDN;
-		V7 = LOG_JEDN;
-		tank1 -= RYCHLOST_PRUTOKU;
-		repaint();
-		if(LA02 == LOG_NULA) {
-			stav = 0;
-			V5 = LOG_NULA;
-			V7 = LOG_NULA;
-			beziAkce = false;
-			stav5 = NEAKTIVNI_STAV;
-			stav0 = AKTIVNI_STAV;
-			vystup = "Zaviram ventily V5 a V7";
-			vstupText = "Tank 1 vypusten";
-		}
-	}
-	
-	/**
-	 * Stav, ve kterem se plni tank2 louhem
-	 */
-	private void stavB1() {
-		V1 = LOG_JEDN;
-		V4 = LOG_JEDN;
-		NTank2 = Napln.LOUH;
-		tank2 += RYCHLOST_PRUTOKU;
-		repaint();
-		if(LA03 == LOG_JEDN) {
-			stav++;
-			V1 = LOG_NULA;
-			V4 = LOG_NULA;
-			stav6 = NEAKTIVNI_STAV;
-			stav7 = AKTIVNI_STAV;
-			vystup = "Zaviram ventily V1 a V4 + oteviram ventil V6 + zapinam cerpadlo";
-			vstupText = "Tank 2 naplnen";
-			phTanku = 100;
-		}
-	}
-	
-	/**
-	 * Stav, ve kterem se z tanku2 cerpa louh dokud neni zcela vycerpan
-	 */
-	private void stavB2() {
-		cerpadlo = LOG_JEDN;
-		V6 = LOG_JEDN;
-		tank2 -= RYCHLOST_PRUTOKU;
-		repaint();
-		if(LA04 == LOG_NULA) {
-			stav++;
-			cerpadlo = LOG_NULA;
-			V6 = LOG_NULA;
-			stav7 = NEAKTIVNI_STAV;
-			stav8 = AKTIVNI_STAV;
-			vystup = "Oteviram ventily V2 a V4 + zaviram ventil V6 + vypinam cerpadlo";
-			vstupText = "Tank 2 vypusten";
-		}
-	}
-	
-	/**
-	 * Stav, ve kterem se tank2 plni vodou
-	 */
-	private void stavB3() {
-		NTank2 = Napln.VODA;
-		V2 = LOG_JEDN;
-		V4 = LOG_JEDN;
-		repaint();
-		tank2 += RYCHLOST_PRUTOKU;
-		if(LA03 == LOG_JEDN) {
-			stav++;
-			stav8 = NEAKTIVNI_STAV;
-			stav9 = AKTIVNI_STAV;
-			vystup = "Oteviram ventily V6 a V7";
-			vstupText = "Tank 2 naplnen";
-		}
-	}
-	
-	/**
-	 * Stav, ve kterem se proplachuje tank2 vodou dokud neni ph v norme 
-	 */
-	private void stavB4() {
-		V6 = LOG_JEDN;
-		V7 = LOG_JEDN;
-		ph = LOG_NULA;
-		double random_ph = r.nextDouble();
-		phTanku -= 1 * random_ph;
-		tank2 -= RYCHLOST_PRUTOKU/2;
-		repaint();
-		if(phTanku <= 0) {
-			stav++;
-			V2 = LOG_NULA;
-			V4 = LOG_NULA;
-			ph = LOG_JEDN;
-			stav9 = NEAKTIVNI_STAV;
-			stav10 = AKTIVNI_STAV;
-			vstupText = "PH kleslo pod pozadovanou mez";
-			vystup = "Zaviram ventily V2 a V4";
-		}
-		if(LA04 == LOG_NULA) {
-			stav--;
-			stav9 = NEAKTIVNI_STAV;
-			stav8 = AKTIVNI_STAV;
-			V6 = LOG_NULA;
-			V7 = LOG_NULA;
-			vystup = "Zaviram ventily V6 a V7";
-			vstupText = "Tank 2 vypusten";
-		}
-	}
-	
-	/**
-	 * Vypousteni zbytku vody z tanku2
-	 */
-	private void stavB5() {
-		V6 = LOG_JEDN;
-		V7 = LOG_JEDN;
-		tank2 -= RYCHLOST_PRUTOKU;
-		repaint();
-		if(LA04 == LOG_NULA) {
-			stav = 0;
-			V6 = LOG_NULA;
-			V7 = LOG_NULA;
-			beziAkce = false;
-			stav10 = NEAKTIVNI_STAV;
-			stav0 = AKTIVNI_STAV;
-			vystup = "Zaviram ventily V6 a V7";
-			vstupText = "Tank 2 vypusten";
-		}
 	}
 	
 	/**
@@ -1210,7 +893,6 @@ public class DrawingPanel extends Component {
 		private void stav3() {
 			NTank1 = Napln.VODA;
 			repaint();
-			tank1 += RYCHLOST_PRUTOKU;
 			if(vstup.equals("I")) {
 				stav++;
 				tank1 = 100;
