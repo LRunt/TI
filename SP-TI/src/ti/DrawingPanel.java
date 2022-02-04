@@ -215,6 +215,8 @@ public class DrawingPanel extends Component {
 					beziAkce = true;
 					vystup = "Oteviram ventil V1 a V3";
 					vstupText = "Stlaceno tlacitko A";
+					V1 = LOG_JEDN;
+					V3 = LOG_JEDN;
 				}
 				if (e.getKeyChar() == 'B' || e.getKeyChar() == 'b') {
 					tlacitkoB = LOG_JEDN;
@@ -239,6 +241,8 @@ public class DrawingPanel extends Component {
 					beziAkce = true;
 					vystup = "Oteviram ventil V1 a V4";
 					vstupText = "Stlaceno tlacitko B";
+					V1 = LOG_JEDN;
+					V4 = LOG_JEDN;
 				}
 				if (e.getKeyChar() == '1') {
 					if(isOvladaniPovoleno()) {
